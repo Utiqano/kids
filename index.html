@@ -15,9 +15,9 @@
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 25%, #fecfef 50%, #a8edea 75%, #fed6e3 100%);
             background-attachment: fixed;
             position: relative;
-            overflow-x: hidden;
+            overflow: hidden;
             margin: 0;
-            padding: 10px;
+            padding: 5px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -58,7 +58,7 @@
 
         .star {
             position: absolute;
-            font-size: 2em;
+            font-size: 1.5em;
             animation: twinkle 2s infinite alternate;
         }
 
@@ -75,15 +75,18 @@
             align-items: center;
             position: relative;
             z-index: 1;
+            height: 100vh;
+            overflow: hidden;
         }
 
         h1 {
             text-align: center;
             color: #ff6b6b;
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 1.8em;
+            margin: 2px 0;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1), 0 0 20px rgba(255, 107, 107, 0.5);
             animation: bounce 2s infinite, glow 3s infinite alternate;
+            flex-shrink: 0;
         }
 
         @keyframes glow {
@@ -95,9 +98,11 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-            align-items: flex-start;
-            gap: 20px;
-            margin-bottom: 20px;
+            align-items: stretch;
+            gap: 10px;
+            margin: 0;
+            flex: 1;
+            overflow: hidden;
         }
 
         .section {
@@ -105,45 +110,51 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
         }
 
         .right {
-            width: 200px;
-            max-width: 250px;
+            width: 180px;
+            max-width: 200px;
+            overflow-y: auto;
+            padding: 5px;
         }
 
         .middle {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
-            height: auto;
-            border: 4px dashed #4ecdc4;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            height: 100%;
+            border: 3px dashed #4ecdc4;
             background: rgba(255, 255, 255, 0.9);
-            padding: 25px;
-            border-radius: 25px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15), inset 0 0 20px rgba(255, 255, 255, 0.3);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 15px rgba(255, 255, 255, 0.3);
+            overflow-y: auto;
+            flex: 1;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
             color: #45b7d1;
-            font-size: 1.4em;
+            font-size: 1em;
             font-weight: bold;
             background: linear-gradient(135deg, #a8edea, #fed6e3);
-            padding: 12px 25px;
-            border-radius: 20px;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1), 0 0 20px rgba(255, 255, 255, 0.5);
+            padding: 5px 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1), 0 0 15px rgba(255, 255, 255, 0.5);
             position: relative;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .header::before {
             content: '✨';
             position: absolute;
-            top: -10px;
-            right: -10px;
-            font-size: 1.5em;
+            top: -5px;
+            right: -5px;
+            font-size: 1em;
             animation: sparkle 2s infinite;
         }
 
@@ -153,16 +164,16 @@
         }
 
         .right .header {
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
 
         #level {
             color: #feca57;
-            font-size: 1.6em;
+            font-size: 1.2em;
             background: linear-gradient(135deg, #feca57, #ff9ff3);
-            padding: 12px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(254, 202, 87, 0.4);
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(254, 202, 87, 0.4);
         }
 
         .shape-container {
@@ -170,28 +181,28 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 5px;
+            margin: 2px;
             animation: fadeIn 0.5s ease-in;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .shape {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            margin-bottom: 5px;
-            font-size: 3em;
+            margin-bottom: 2px;
+            font-size: 2em;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.5);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.5);
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
             user-select: none;
             -webkit-user-select: none;
@@ -199,8 +210,8 @@
         }
 
         .shape:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.7);
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.7);
         }
 
         .shape.ghost {
@@ -210,15 +221,15 @@
 
         .shape.matched {
             opacity: 1;
-            text-shadow: 0 0 20px #90EE90;
+            text-shadow: 0 0 15px #90EE90;
             background: linear-gradient(135deg, #90EE90, #98FB98);
             animation: pulse 1s infinite, confetti 0.5s ease-out;
-            box-shadow: 0 0 30px rgba(144, 238, 144, 0.6);
+            box-shadow: 0 0 25px rgba(144, 238, 144, 0.6);
         }
 
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.03); }
             100% { transform: scale(1); }
         }
 
@@ -228,28 +239,28 @@
         }
 
         .shape-label {
-            font-size: 0.9em;
+            font-size: 0.7em;
             color: #666;
             text-align: center;
-            margin-top: 5px;
+            margin-top: 2px;
             font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
         }
 
         .drop-zone {
-            width: 100px;
-            height: 100px;
-            border: 3px dashed #999;
+            width: 70px;
+            height: 70px;
+            border: 2px dashed #999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
-            border-radius: 20px;
+            border-radius: 15px;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
-            min-height: 80px;
+            min-height: 60px;
             transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
             touch-action: manipulation;
         }
 
@@ -263,7 +274,7 @@
             border-color: #4CAF50;
             background: linear-gradient(135deg, rgba(144, 238, 144, 0.9), rgba(144, 238, 144, 0.7));
             animation: success 0.5s ease;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
         }
 
         @keyframes success {
@@ -283,48 +294,52 @@
         /* Landscape Orientation */
         @media (orientation: landscape) and (max-height: 500px) {
             body {
-                padding: 5px;
+                padding: 2px;
             }
 
             h1 {
-                font-size: 1.8em;
-                margin-bottom: 5px;
+                font-size: 1.5em;
+                margin-bottom: 2px;
             }
 
             .game-container {
-                gap: 10px;
+                gap: 5px;
             }
 
             .middle {
                 grid-template-columns: repeat(5, 1fr);
-                gap: 10px;
-                padding: 15px;
+                gap: 5px;
+                padding: 8px;
             }
 
             .right {
-                width: 150px;
-                max-width: 180px;
+                width: 120px;
+                max-width: 140px;
             }
 
             .shape {
-                width: 60px;
-                height: 60px;
-                font-size: 2em;
+                width: 50px;
+                height: 50px;
+                font-size: 1.5em;
             }
 
             .drop-zone {
-                width: 70px;
-                height: 70px;
+                width: 60px;
+                height: 60px;
             }
 
             .header {
-                font-size: 1em;
-                padding: 8px 12px;
+                font-size: 0.8em;
+                padding: 4px 8px;
             }
 
             #level {
-                font-size: 1.2em;
-                padding: 8px;
+                font-size: 1em;
+                padding: 4px;
+            }
+
+            .shape-label {
+                font-size: 0.6em;
             }
         }
 
@@ -333,7 +348,7 @@
             .game-container {
                 flex-direction: column;
                 align-items: center;
-                gap: 30px;
+                gap: 10px;
             }
 
             .right {
@@ -343,39 +358,9 @@
             }
 
             .middle {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-                gap: 10px;
-                padding: 15px;
-            }
-
-            .shape {
-                width: 70px;
-                height: 70px;
-                font-size: 2.5em;
-            }
-
-            .drop-zone {
-                width: 90px;
-                height: 90px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            .header {
-                font-size: 1.2em;
-                padding: 8px 15px;
-            }
-
-            #level {
-                font-size: 1.3em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 5px;
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                gap: 5px;
+                padding: 8px;
             }
 
             .shape {
@@ -385,18 +370,48 @@
             }
 
             .drop-zone {
-                width: 80px;
-                height: 80px;
-            }
-
-            .middle {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-                padding: 10px;
+                width: 70px;
+                height: 70px;
             }
 
             h1 {
-                font-size: 1.8em;
+                font-size: 1.5em;
+            }
+
+            .header {
+                font-size: 0.9em;
+                padding: 4px 8px;
+            }
+
+            #level {
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 2px;
+            }
+
+            .shape {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5em;
+            }
+
+            .drop-zone {
+                width: 60px;
+                height: 60px;
+            }
+
+            .middle {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+                padding: 5px;
+            }
+
+            h1 {
+                font-size: 1.3em;
             }
         }
 
@@ -404,13 +419,14 @@
             position: fixed;
             top: 10px;
             left: 10px;
-            padding: 10px;
+            padding: 5px;
             background: #4ecdc4;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             z-index: 1000;
+            font-size: 0.8em;
         }
     </style>
 </head>
@@ -434,7 +450,7 @@
         // Add random stars for kid-friendly background
         function createStars() {
             const starsContainer = document.querySelector('.stars');
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 15; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.innerHTML = '⭐';
