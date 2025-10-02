@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -23,6 +24,7 @@
             align-items: center;
             min-height: 100vh;
             color: #333;
+            touch-action: none; /* Prevent default touch behaviors */
         }
 
         body::before {
@@ -192,6 +194,9 @@
             border-radius: 50%;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.5);
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
         }
 
         .shape:hover {
@@ -246,6 +251,7 @@
             min-height: 80px;
             transition: all 0.3s ease;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            touch-action: manipulation;
         }
 
         .drop-zone:hover {
@@ -270,6 +276,57 @@
         .shape.dragging {
             opacity: 0.6;
             transform: scale(0.9) rotate(0deg);
+            z-index: 1000;
+            position: fixed !important;
+            pointer-events: none;
+        }
+
+        /* Landscape Orientation */
+        @media (orientation: landscape) and (max-height: 500px) {
+            body {
+                padding: 5px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 5px;
+            }
+
+            .game-container {
+                gap: 10px;
+            }
+
+            .middle {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 10px;
+                padding: 15px;
+            }
+
+            .right {
+                width: 150px;
+                max-width: 180px;
+            }
+
+            .shape {
+                width: 60px;
+                height: 60px;
+                font-size: 2em;
+            }
+
+            .drop-zone {
+                width: 70px;
+                height: 70px;
+            }
+
+            .header {
+                font-size: 1em;
+                padding: 8px 12px;
+            }
+
+            #level {
+                font-size: 1.2em;
+                padding: 8px;
+            }
         }
 
         /* Responsive Design */
@@ -343,9 +400,23 @@
                 font-size: 1.8em;
             }
         }
+
+        #test-voice {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background: #4ecdc4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
+    <button id="test-voice">اختبار الصوت</button>
     <div class="stars"></div>
     <div class="game-wrapper">
         <h1>🎮 لعبة مطابقة الأشكال الممتعة 🎮</h1>
@@ -387,6 +458,11 @@
 
         // Initial load
         loadVoices();
+
+        // Test voice button
+        document.getElementById('test-voice').addEventListener('click', () => {
+            speak('اختبار الصوت يعمل');
+        });
 
         const categories = [
             {
@@ -535,6 +611,8 @@
         ];
 
         let currentLevel = 1;
+        let draggedElement = null;
+        let draggedData = null;
 
         function loadLevel() {
             const catIndex = (currentLevel - 1) % categories.length;
@@ -589,23 +667,47 @@
             });
 
             // Rebind events
+            bindEvents();
+        }
+
+        function bindEvents() {
             const solids = document.querySelectorAll('.shape.solid');
             solids.forEach(solid => {
-                solid.removeEventListener('dragstart', dragStart); // Remove previous if any
+                solid.removeEventListener('dragstart', dragStart);
+                solid.removeEventListener('touchstart', touchStart);
                 solid.addEventListener('dragstart', dragStart);
+                solid.addEventListener('touchstart', touchStart, { passive: false });
             });
 
             const dropZones = document.querySelectorAll('.drop-zone');
             dropZones.forEach(zone => {
                 zone.removeEventListener('dragover', dragOver);
                 zone.removeEventListener('drop', drop);
+                zone.removeEventListener('touchmove', touchMove);
+                zone.removeEventListener('touchend', touchEnd);
                 zone.addEventListener('dragover', dragOver);
                 zone.addEventListener('drop', drop);
+                zone.addEventListener('touchmove', touchMove, { passive: false });
+                zone.addEventListener('touchend', touchEnd, { passive: false });
             });
+
+            // Document events for touch
+            document.removeEventListener('touchmove', handleTouchMove, { passive: false });
+            document.removeEventListener('touchend', handleTouchEnd, { passive: false });
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd, { passive: false });
         }
 
         function speak(text) {
-            if ('speechSynthesis' in window && voices.length > 0) {
+            // Wait for voices to load if not yet loaded
+            if (voices.length === 0) {
+                loadVoices();
+                setTimeout(() => speak(text), 100);
+                return;
+            }
+
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel(); // Cancel any ongoing speech
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.rate = 0.8;
                 const arabicVoice = voices.find(voice => voice.lang.startsWith('ar'));
@@ -615,6 +717,8 @@
                 } else {
                     utterance.lang = 'ar';
                 }
+                utterance.onend = () => console.log('Speech finished');
+                utterance.onerror = (event) => console.error('Speech error:', event.error);
                 speechSynthesis.speak(utterance);
             } else {
                 // Fallback to alert or console
@@ -623,6 +727,7 @@
             }
         }
 
+        // Desktop Drag Events
         function dragStart(e) {
             const id = e.target.id;
             const type = e.target.dataset.type;
@@ -641,13 +746,102 @@
             const shapeType = data[1];
             const zoneShape = e.currentTarget.dataset.shape;
 
+            handleDrop(solidId, shapeType, zoneShape);
+            document.querySelectorAll('.shape.solid').forEach(s => s.classList.remove('dragging'));
+        }
+
+        // Touch Events
+        function touchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const solid = e.target;
+            draggedElement = solid;
+            draggedData = `${solid.id}|${solid.dataset.type}`;
+            solid.classList.add('dragging');
+            // Clone for dragging ghost
+            const ghost = solid.cloneNode(true);
+            ghost.style.position = 'fixed';
+            ghost.style.zIndex = '1000';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.opacity = '0.7';
+            ghost.style.transform = 'scale(1.1)';
+            document.body.appendChild(ghost);
+            draggedGhost = ghost;
+
+            function moveGhost(clientX, clientY) {
+                const rect = ghost.getBoundingClientRect();
+                ghost.style.left = (clientX - rect.width / 2) + 'px';
+                ghost.style.top = (clientY - rect.height / 2) + 'px';
+            }
+            moveGhost(touch.clientX, touch.clientY);
+        }
+
+        let draggedGhost = null;
+
+        function handleTouchMove(e) {
+            if (!draggedElement || !draggedGhost) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = draggedGhost.getBoundingClientRect();
+            draggedGhost.style.left = (touch.clientX - rect.width / 2) + 'px';
+            draggedGhost.style.top = (touch.clientY - rect.height / 2) + 'px';
+        }
+
+        function handleTouchEnd(e) {
+            if (!draggedElement || !draggedGhost) return;
+            e.preventDefault();
+            const touch = e.changedTouches[0];
+            const x = touch.clientX;
+            const y = touch.clientY;
+
+            // Find if over a drop zone
+            const dropZones = document.querySelectorAll('.drop-zone:not(.matched)');
+            let targetZone = null;
+            for (let zone of dropZones) {
+                const rect = zone.getBoundingClientRect();
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    targetZone = zone;
+                    break;
+                }
+            }
+
+            if (targetZone) {
+                const data = draggedData.split('|');
+                const solidId = data[0];
+                const shapeType = data[1];
+                const zoneShape = targetZone.dataset.shape;
+                handleDrop(solidId, shapeType, zoneShape);
+            } else {
+                speak('خطأ');
+            }
+
+            // Clean up
+            if (draggedGhost) {
+                draggedGhost.remove();
+                draggedGhost = null;
+            }
+            draggedElement.classList.remove('dragging');
+            draggedElement = null;
+            draggedData = null;
+        }
+
+        function touchMove(e) {
+            // Handled by document
+        }
+
+        function touchEnd(e) {
+            // Handled by document
+        }
+
+        function handleDrop(solidId, shapeType, zoneShape) {
             if (shapeType === zoneShape) {
-                const ghost = e.currentTarget.querySelector('.shape');
-                ghost.remove();
+                const ghost = document.querySelector(`[data-shape="${zoneShape}"] .shape.ghost`);
+                if (ghost) ghost.remove();
                 const solid = document.getElementById(solidId);
-                e.currentTarget.appendChild(solid);
+                const targetZone = document.querySelector(`[data-shape="${zoneShape}"]`);
+                targetZone.appendChild(solid);
                 solid.classList.add('matched');
-                e.currentTarget.classList.add('matched');
+                targetZone.classList.add('matched');
                 speak(zoneShape);
 
                 // Check if level complete
@@ -662,8 +856,6 @@
             } else {
                 speak('خطأ');
             }
-
-            document.querySelectorAll('.shape.solid').forEach(s => s.classList.remove('dragging'));
         }
 
         // Initialize
