@@ -599,7 +599,7 @@
             const catIndex = (currentLevel - 1) % categories.length;
             const cat = categories[catIndex];
             let items = [...cat.items];
-            items = items.sort(() => 0.5 - Math.random()).slice(0, 5);
+            items = items.sort(() => 0.5 - Math.random()).slice(0, 4);
 
             const middle = document.querySelector('.middle');
             const right = document.querySelector('.right');
@@ -712,7 +712,7 @@
 
                 // Check if level complete
                 const matchedCount = document.querySelectorAll('.drop-zone.matched').length;
-                if (matchedCount === 5) {
+                if (matchedCount === 4) {
                     setTimeout(() => {
                         currentLevel++;
                         loadLevel();
