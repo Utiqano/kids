@@ -128,29 +128,29 @@
 
         .middle {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(4, 1fr); /* 4 columns for 2 right, 2 left */
+            gap: 20px;
             height: auto;
             border: 4px dashed #4ecdc4;
             background: rgba(255, 255, 255, 0.9);
-            padding: 25px;
+            padding: 30px;
             border-radius: 25px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.15), inset 0 0 20px rgba(255, 255, 255, 0.3);
-            max-height: 100%;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            max-height: calc(100% - 120px); /* Adjusted for single row */
+            overflow-y: hidden;
+            direction: rtl; /* Enforce right-to-left flow */
+            justify-content: start; /* Prioritize right-side alignment */
             align-items: center;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: #45b7d1;
-            font-size: 1.4em;
+            font-size: 1.5em;
             font-weight: bold;
             background: linear-gradient(135deg, #a8edea, #fed6e3);
-            padding: 12px 25px;
+            padding: 15px 30px;
             border-radius: 20px;
             box-shadow: 0 8px 15px rgba(0,0,0,0.1), 0 0 20px rgba(255, 255, 255, 0.5);
             position: relative;
@@ -247,10 +247,10 @@
         }
 
         .shape-label {
-            font-size: 0.9em;
-            color: #666;
+            font-size: 1em;
+            color: #444;
             text-align: center;
-            margin-top: 5px;
+            margin-top: 8px;
             font-weight: bold;
             text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
             flex-shrink: 0;
@@ -269,7 +269,7 @@
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
             min-height: 80px;
             transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1), 0 0 10px rgba(0,0,0,0.05);
         }
 
         .drop-zone:hover {
@@ -330,12 +330,13 @@
             }
 
             .middle {
-                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-                gap: 8px;
-                padding: 10px;
-                max-height: 35vh;
-                overflow: hidden;
-                justify-content: flex-start;
+                grid-template-columns: repeat(2, 1fr); /* 2 columns for mobile */
+                gap: 12px;
+                padding: 15px;
+                max-height: calc(40vh - 100px); /* Adjusted for 2 rows */
+                overflow-y: hidden;
+                direction: rtl;
+                justify-content: start;
             }
 
             .shape {
@@ -356,13 +357,18 @@
             }
 
             .header {
-                font-size: 1.1em;
-                padding: 8px 15px;
+                font-size: 1.2em;
+                padding: 10px 20px;
             }
 
             #level {
                 font-size: 1.2em;
                 padding: 8px;
+            }
+
+            .shape-label {
+                font-size: 0.9em;
+                margin-top: 6px;
             }
         }
 
@@ -380,9 +386,12 @@
 
             .middle {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 5px;
-                padding: 5px;
-                max-height: 30vh;
+                gap: 8px;
+                padding: 10px;
+                max-height: calc(35vh - 80px); /* Adjusted for 2 rows */
+                overflow-y: hidden;
+                direction: rtl;
+                justify-content: start;
             }
 
             h1 {
@@ -391,7 +400,7 @@
 
             .header {
                 font-size: 1em;
-                padding: 6px 10px;
+                padding: 8px 15px;
             }
 
             #level {
@@ -402,6 +411,11 @@
                 gap: 5px;
                 padding: 5px 0;
             }
+
+            .shape-label {
+                font-size: 0.8em;
+                margin-top: 5px;
+            }
         }
     </style>
 </head>
@@ -411,7 +425,7 @@
         <h1>🎮 لعبة مطابقة الأشكال الممتعة 🎮</h1>
         <div class="game-container">
             <div class="section middle">
-                <div class="header">الأشكال المطلوبة</div>
+                <div class="header">عادي</div>
                 <div id="level" class="header"></div>
             </div>
             <div class="section right">
@@ -452,143 +466,143 @@
             {
                 name: 'أشكال',
                 items: [
-                    {emoji: '🔲', name: 'مربع'},
-                    {emoji: '🔺', name: 'مثلث'},
-                    {emoji: '📦', name: 'مستطيل'},
-                    {emoji: '⭕', name: 'دائرة'},
-                    {emoji: '⭐', name: 'نجمة'},
-                    {emoji: '🔷', name: 'معين'},
-                    {emoji: '💠', name: 'ماسة'}
+                    { emoji: '🔲', name: 'مربع' },
+                    { emoji: '🔺', name: 'مثلث' },
+                    { emoji: '📦', name: 'مستطيل' },
+                    { emoji: '⭕', name: 'دائرة' },
+                    { emoji: '⭐', name: 'نجمة' },
+                    { emoji: '🔷', name: 'معين' },
+                    { emoji: '💠', name: 'ماسة' }
                 ]
             },
             {
                 name: 'ألوان',
                 items: [
-                    {emoji: '🔴', name: 'أحمر'},
-                    {emoji: '🟠', name: 'برتقالي'},
-                    {emoji: '🟡', name: 'أصفر'},
-                    {emoji: '🟢', name: 'أخضر'},
-                    {emoji: '🔵', name: 'أزرق'},
-                    {emoji: '🟣', name: 'بنفسجي'},
-                    {emoji: '⚫', name: 'أسود'},
-                    {emoji: '⚪', name: 'أبيض'},
-                    {emoji: '🟤', name: 'بني'},
-                    {emoji: '🌈', name: 'قوس قزح'}
+                    { emoji: '🔴', name: 'أحمر' },
+                    { emoji: '🟠', name: 'برتقالي' },
+                    { emoji: '🟡', name: 'أصفر' },
+                    { emoji: '🟢', name: 'أخضر' },
+                    { emoji: '🔵', name: 'أزرق' },
+                    { emoji: '🟣', name: 'بنفسجي' },
+                    { emoji: '⚫', name: 'أسود' },
+                    { emoji: '⚪', name: 'أبيض' },
+                    { emoji: '🟤', name: 'بني' },
+                    { emoji: '🌈', name: 'قوس قزح' }
                 ]
             },
             {
                 name: 'أرقام',
                 items: [
-                    {emoji: '0️⃣', name: 'صفر'},
-                    {emoji: '1️⃣', name: 'واحد'},
-                    {emoji: '2️⃣', name: 'اثنان'},
-                    {emoji: '3️⃣', name: 'ثلاثة'},
-                    {emoji: '4️⃣', name: 'أربعة'},
-                    {emoji: '5️⃣', name: 'خمسة'},
-                    {emoji: '6️⃣', name: 'ستة'},
-                    {emoji: '7️⃣', name: 'سبعة'},
-                    {emoji: '8️⃣', name: 'ثمانية'},
-                    {emoji: '9️⃣', name: 'تسعة'},
-                    {emoji: '🔟', name: 'عشرة'}
+                    { emoji: '0️⃣', name: 'صفر' },
+                    { emoji: '1️⃣', name: 'واحد' },
+                    { emoji: '2️⃣', name: 'اثنان' },
+                    { emoji: '3️⃣', name: 'ثلاثة' },
+                    { emoji: '4️⃣', name: 'أربعة' },
+                    { emoji: '5️⃣', name: 'خمسة' },
+                    { emoji: '6️⃣', name: 'ستة' },
+                    { emoji: '7️⃣', name: 'سبعة' },
+                    { emoji: '8️⃣', name: 'ثمانية' },
+                    { emoji: '9️⃣', name: 'تسعة' },
+                    { emoji: '🔟', name: 'عشرة' }
                 ]
             },
             {
                 name: 'فواكه',
                 items: [
-                    {emoji: '🍎', name: 'تفاح'},
-                    {emoji: '🍏', name: 'تفاح أخضر'},
-                    {emoji: '🍊', name: 'برتقال'},
-                    {emoji: '🍋', name: 'ليمون'},
-                    {emoji: '🍌', name: 'موز'},
-                    {emoji: '🍍', name: 'أناناس'},
-                    {emoji: '🥭', name: 'مانجو'},
-                    {emoji: '🍇', name: 'عنب'},
-                    {emoji: '🍓', name: 'فراولة'},
-                    {emoji: '🍒', name: 'كرز'},
-                    {emoji: '🥝', name: 'كيوي'},
-                    {emoji: '🍉', name: 'بطيخ'},
-                    {emoji: '🍈', name: 'شمام'},
-                    {emoji: '🥥', name: 'جوز الهند'}
+                    { emoji: '🍎', name: 'تفاح' },
+                    { emoji: '🍏', name: 'تفاح أخضر' },
+                    { emoji: '🍊', name: 'برتقال' },
+                    { emoji: '🍋', name: 'ليمون' },
+                    { emoji: '🍌', name: 'موز' },
+                    { emoji: '🍍', name: 'أناناس' },
+                    { emoji: '🥭', name: 'مانجو' },
+                    { emoji: '🍇', name: 'عنب' },
+                    { emoji: '🍓', name: 'فراولة' },
+                    { emoji: '🍒', name: 'كرز' },
+                    { emoji: '🥝', name: 'كيوي' },
+                    { emoji: '🍉', name: 'بطيخ' },
+                    { emoji: '🍈', name: 'شمام' },
+                    { emoji: '🥥', name: 'جوز الهند' }
                 ]
             },
             {
                 name: 'خضروات',
                 items: [
-                    {emoji: '🥕', name: 'جزر'},
-                    {emoji: '🥬', name: 'خس'},
-                    {emoji: '🍅', name: 'طماطم'},
-                    {emoji: '🥦', name: 'بروكولي'},
-                    {emoji: '🥒', name: 'خيار'},
-                    {emoji: '🌽', name: 'ذرة'},
-                    {emoji: '🥔', name: 'بطاطس'},
-                    {emoji: '🧅', name: 'بصل'},
-                    {emoji: '🧄', name: 'ثوم'},
-                    {emoji: '🥑', name: 'أفوكادو'},
-                    {emoji: '🍆', name: 'باذنجان'},
-                    {emoji: '🌶️', name: 'فلفل'},
-                    {emoji: '🫑', name: 'فلفل أخضر'}
+                    { emoji: '🥕', name: 'جزر' },
+                    { emoji: '🥬', name: 'خس' },
+                    { emoji: '🍅', name: 'طماطم' },
+                    { emoji: '🥦', name: 'بروكولي' },
+                    { emoji: '🥒', name: 'خيار' },
+                    { emoji: '🌽', name: 'ذرة' },
+                    { emoji: '🥔', name: 'بطاطس' },
+                    { emoji: '🧅', name: 'بصل' },
+                    { emoji: '🧄', name: 'ثوم' },
+                    { emoji: '🥑', name: 'أفوكادو' },
+                    { emoji: '🍆', name: 'باذنجان' },
+                    { emoji: '🌶️', name: 'فلفل' },
+                    { emoji: '🫑', name: 'فلفل أخضر' }
                 ]
             },
             {
                 name: 'حيوانات',
                 items: [
-                    {emoji: '🐶', name: 'كلب'},
-                    {emoji: '🐱', name: 'قط'},
-                    {emoji: '🦁', name: 'أسد'},
-                    {emoji: '🐯', name: 'نمر'},
-                    {emoji: '🐻', name: 'دب'},
-                    {emoji: '🐼', name: 'باندا'},
-                    {emoji: '🦊', name: 'ثعلب'},
-                    {emoji: '🐺', name: 'ذئب'},
-                    {emoji: '🐵', name: 'قرد'},
-                    {emoji: '🦍', name: 'غوريلا'},
-                    {emoji: '🐘', name: 'فيل'},
-                    {emoji: '🦏', name: 'وحيد القرن'},
-                    {emoji: '🦛', name: 'فرس النهر'},
-                    {emoji: '🐳', name: 'حوت'},
-                    {emoji: '🐬', name: 'دولفين'},
-                    {emoji: '🐠', name: 'سمكة استوائية'},
-                    {emoji: '🐙', name: 'أخطبوط'},
-                    {emoji: '🦑', name: 'كالاماري'},
-                    {emoji: '🐊', name: 'تمساح'},
-                    {emoji: '🐍', name: 'ثعبان'},
-                    {emoji: '🐸', name: 'ضفدع'}
+                    { emoji: '🐶', name: 'كلب' },
+                    { emoji: '🐱', name: 'قط' },
+                    { emoji: '🦁', name: 'أسد' },
+                    { emoji: '🐯', name: 'نمر' },
+                    { emoji: '🐻', name: 'دب' },
+                    { emoji: '🐼', name: 'باندا' },
+                    { emoji: '🦊', name: 'ثعلب' },
+                    { emoji: '🐺', name: 'ذئب' },
+                    { emoji: '🐵', name: 'قرد' },
+                    { emoji: '🦍', name: 'غوريلا' },
+                    { emoji: '🐘', name: 'فيل' },
+                    { emoji: '🦏', name: 'وحيد القرن' },
+                    { emoji: '🦛', name: 'فرس النهر' },
+                    { emoji: '🐳', name: 'حوت' },
+                    { emoji: '🐬', name: 'دولفين' },
+                    { emoji: '🐠', name: 'سمكة استوائية' },
+                    { emoji: '🐙', name: 'أخطبوط' },
+                    { emoji: '🦑', name: 'كالاماري' },
+                    { emoji: '🐊', name: 'تمساح' },
+                    { emoji: '🐍', name: 'ثعبان' },
+                    { emoji: '🐸', name: 'ضفدع' }
                 ]
             },
             {
                 name: 'طيور',
                 items: [
-                    {emoji: '🐦', name: 'طائر'},
-                    {emoji: '🦅', name: 'نسر'},
-                    {emoji: '🦉', name: 'بومة'},
-                    {emoji: '🦆', name: 'بطة'},
-                    {emoji: '🦢', name: 'بجعة'},
-                    {emoji: '🐧', name: 'بطريق'},
-                    {emoji: '🐓', name: 'ديك'},
-                    {emoji: '🐔', name: 'دجاجة'},
-                    {emoji: '🦃', name: 'ديك رومي'},
-                    {emoji: '🦜', name: 'ببغاء'},
-                    {emoji: '🕊️', name: 'حمامة'}
+                    { emoji: '🐦', name: 'طائر' },
+                    { emoji: '🦅', name: 'نسر' },
+                    { emoji: '🦉', name: 'بومة' },
+                    { emoji: '🦆', name: 'بطة' },
+                    { emoji: '🦢', name: 'بجعة' },
+                    { emoji: '🐧', name: 'بطريق' },
+                    { emoji: '🐓', name: 'ديك' },
+                    { emoji: '🐔', name: 'دجاجة' },
+                    { emoji: '🦃', name: 'ديك رومي' },
+                    { emoji: '🦜', name: 'ببغاء' },
+                    { emoji: '🕊️', name: 'حمامة' }
                 ]
             },
             {
                 name: 'مركبات',
                 items: [
-                    {emoji: '🚗', name: 'سيارة'},
-                    {emoji: '🚙', name: 'سيارة رياضية'},
-                    {emoji: '🚌', name: 'حافلة'},
-                    {emoji: '🚛', name: 'شاحنة'},
-                    {emoji: '🚜', name: 'جرار'},
-                    {emoji: '🏎️', name: 'سيارة سباق'},
-                    {emoji: '🚓', name: 'سيارة شرطة'},
-                    {emoji: '🚑', name: 'إسعاف'},
-                    {emoji: '🚒', name: 'إطفاء'},
-                    {emoji: '🚂', name: 'قطار'},
-                    {emoji: '✈️', name: 'طائرة'},
-                    {emoji: '🛩️', name: 'طائرة صغيرة'},
-                    {emoji: '🚀', name: 'صاروخ'},
-                    {emoji: '🛸', name: 'مركبة فضائية'},
-                    {emoji: '🚤', name: 'قارب'}
+                    { emoji: '🚗', name: 'سيارة' },
+                    { emoji: '🚙', name: 'سيارة رياضية' },
+                    { emoji: '🚌', name: 'حافلة' },
+                    { emoji: '🚛', name: 'شاحنة' },
+                    { emoji: '🚜', name: 'جرار' },
+                    { emoji: '🏎️', name: 'سيارة سباق' },
+                    { emoji: '🚓', name: 'سيارة شرطة' },
+                    { emoji: '🚑', name: 'إسعاف' },
+                    { emoji: '🚒', name: 'إطفاء' },
+                    { emoji: '🚂', name: 'قطار' },
+                    { emoji: '✈️', name: 'طائرة' },
+                    { emoji: '🛩️', name: 'طائرة صغيرة' },
+                    { emoji: '🚀', name: 'صاروخ' },
+                    { emoji: '🛸', name: 'مركبة فضائية' },
+                    { emoji: '🚤', name: 'قارب' }
                 ]
             }
         ];
@@ -599,7 +613,7 @@
             const catIndex = (currentLevel - 1) % categories.length;
             const cat = categories[catIndex];
             let items = [...cat.items];
-            items = items.sort(() => 0.5 - Math.random()).slice(0, 4);
+            items = items.sort(() => 0.5 - Math.random()).slice(0, 4); // Changed to 4 items
 
             const middle = document.querySelector('.middle');
             const right = document.querySelector('.right');
@@ -608,11 +622,11 @@
             middle.querySelectorAll('.shape-container').forEach(el => el.remove());
             right.querySelectorAll('.shape-container').forEach(el => el.remove());
 
-            // Add level header if not exists
+            // Add level header
             let levelDiv = document.getElementById('level');
             levelDiv.textContent = `المستوى ${currentLevel} - ${cat.name}`;
 
-            items.forEach((item, index) => {
+            items.forEach((item) => {
                 // Middle - Ghost
                 const midCont = document.createElement('div');
                 midCont.className = 'shape-container';
@@ -650,7 +664,7 @@
             // Rebind events
             const solids = document.querySelectorAll('.shape.solid');
             solids.forEach(solid => {
-                solid.removeEventListener('dragstart', dragStart); // Remove previous if any
+                solid.removeEventListener('dragstart', dragStart);
                 solid.addEventListener('dragstart', dragStart);
             });
 
@@ -676,9 +690,8 @@
                 }
                 speechSynthesis.speak(utterance);
             } else {
-                // Fallback to alert or console
                 console.log('Voice not available: ' + text);
-                alert(text); // Simple fallback
+                alert(text);
             }
         }
 
@@ -708,11 +721,11 @@
                 e.currentTarget.appendChild(solid);
                 solid.classList.add('matched');
                 e.currentTarget.classList.add('matched');
-                speak(zoneShape); // ينطق الاسم بالضبط كما هو، مثل "دائرة"
+                speak(zoneShape);
 
                 // Check if level complete
                 const matchedCount = document.querySelectorAll('.drop-zone.matched').length;
-                if (matchedCount === 4) {
+                if (matchedCount === 4) { // Changed to 4
                     setTimeout(() => {
                         currentLevel++;
                         loadLevel();
