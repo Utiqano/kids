@@ -51,8 +51,26 @@
             transition: all 0.3s ease;
         }
 
-        #toggle-btn:hover {
+        #toggle-btn:hover, #restart-btn:hover {
             background: #ff8787;
+        }
+
+        #restart-btn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 100;
+            background: #4ecdc4;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            display: none;
         }
 
         #main-area {
@@ -82,8 +100,29 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .shape:active {
+        .shape:active, .shape.dragging {
             transform: scale(0.95);
+        }
+
+        .shape.success {
+            background: linear-gradient(45deg, #a8e6cf, #dcedc1);
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        .shape.fail {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
         #target {
@@ -99,6 +138,14 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             font-size: 48px;
             opacity: 0.4;
+            transition: all 0.3s ease;
+        }
+
+        #target.success {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.2);
+            opacity: 1;
+            animation: pulse 0.5s ease-in-out;
         }
 
         #level-display {
@@ -111,6 +158,20 @@
             padding: 8px 16px;
             border-radius: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #category-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 10px;
+            display: none;
         }
 
         @media (max-width: 600px) {
@@ -131,7 +192,7 @@
                 font-size: 36px;
             }
 
-            #toggle-btn {
+            #toggle-btn, #restart-btn {
                 width: 35px;
                 height: 35px;
                 font-size: 18px;
@@ -141,12 +202,14 @@
 </head>
 <body>
     <button id="toggle-btn">☰</button>
+    <button id="restart-btn" title="Restart">↻</button>
     <div id="sidebar">
         <!-- Shapes added dynamically -->
     </div>
     <div id="main-area">
         <div id="target"></div>
         <div id="level-display">Level: 1</div>
+        <div id="category-hint"></div>
     </div>
 
     <script>
@@ -224,30 +287,58 @@
 
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggle-btn');
+        const restartBtn = document.getElementById('restart-btn');
         const target = document.getElementById('target');
         const levelDisplay = document.getElementById('level-display');
+        const categoryHint = document.getElementById('category-hint');
 
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
             toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '☰' : '✖';
         });
 
+        restartBtn.addEventListener('click', () => {
+            currentLevel = 1;
+            initLevel();
+            restartBtn.style.display = 'none';
+        });
+
+        function playSound(frequency = 800, duration = 200) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+
         function initLevel() {
             if (currentLevel > maxLevels) {
-                levelDisplay.textContent = 'Game Completed!';
+                levelDisplay.textContent = `Game Completed! 🎉 (Level ${maxLevels})`;
                 sidebar.innerHTML = '';
                 target.innerHTML = '';
+                categoryHint.textContent = '';
+                categoryHint.style.display = 'none';
+                restartBtn.style.display = 'block';
+                toggleBtn.style.display = 'none'; // Hide sidebar toggle on end
                 return;
             }
 
             currentCategory = categories[Math.floor(Math.random() * categories.length)];
             sidebar.innerHTML = '';
             target.innerHTML = '';
+            target.classList.remove('success');
 
             currentCategory.items.forEach(item => {
                 const shape = document.createElement('div');
                 shape.className = 'shape';
                 shape.id = item.id;
+                shape.setAttribute('aria-label', `${item.emoji} ${item.name}`);
                 shape.textContent = item.emoji;
                 shape.draggable = true;
                 shape.addEventListener('dragstart', dragStart);
@@ -256,13 +347,14 @@
             });
 
             correctItem = currentCategory.items[Math.floor(Math.random() * currentCategory.items.length)];
-
             target.textContent = correctItem.emoji;
-
-            levelDisplay.textContent = `Level: ${currentLevel}`;
+            levelDisplay.textContent = `Level: ${currentLevel} - ${currentCategory.name}`;
+            categoryHint.textContent = `ابحث عن: ${correctItem.name}!`;
+            categoryHint.style.display = 'block';
         }
 
         function dragStart(e) {
+            e.target.classList.add('dragging');
             e.dataTransfer.setData('text/plain', e.target.id);
         }
 
@@ -270,8 +362,13 @@
             e.preventDefault();
             const touch = e.touches[0];
             const elem = e.target;
+            elem.classList.add('dragging');
             elem.style.position = 'absolute';
             elem.style.zIndex = 1000;
+            let startX = touch.clientX - elem.offsetWidth / 2;
+            let startY = touch.clientY - elem.offsetHeight / 2;
+            elem.style.left = `${startX}px`;
+            elem.style.top = `${startY}px`;
 
             function touchMove(ev) {
                 ev.preventDefault();
@@ -285,8 +382,9 @@
                 document.removeEventListener('touchend', touchEnd);
                 const dropX = ev.changedTouches[0].clientX;
                 const dropY = ev.changedTouches[0].clientY;
+                elem.classList.remove('dragging');
                 if (isOverTarget(dropX, dropY)) {
-                    checkDrop(elem.id);
+                    checkDrop(elem.id, elem);
                 } else {
                     elem.style.position = '';
                     elem.style.left = '';
@@ -302,7 +400,9 @@
         target.addEventListener('drop', e => {
             e.preventDefault();
             const id = e.dataTransfer.getData('text/plain');
-            checkDrop(id);
+            const draggedElem = document.getElementById(id);
+            checkDrop(id, draggedElem);
+            draggedElem.classList.remove('dragging');
         });
 
         function isOverTarget(x, y) {
@@ -310,35 +410,44 @@
             return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
         }
 
-        function checkDrop(id) {
+        function checkDrop(id, elem = null) {
             const droppedItem = currentCategory.items.find(item => item.id === id);
             speak(droppedItem.name);
+
             if (id === correctItem.id) {
-                currentLevel++;
-                setTimeout(initLevel, 1000);
+                // Success
+                playSound(800, 300); // Happy tone
+                if (elem) elem.classList.add('success');
+                target.classList.add('success');
+                setTimeout(() => {
+                    currentLevel++;
+                    initLevel();
+                }, 1500); // Pause for celebration
+            } else {
+                // Failure
+                playSound(400, 200); // Sad tone
+                if (elem) elem.classList.add('fail');
+                setTimeout(() => {
+                    if (elem) elem.classList.remove('fail');
+                }, 500);
             }
         }
 
         function speak(text) {
             if (synth) {
-                // Cancel any ongoing speech to prevent overlap
                 synth.cancel();
-                
-                // Create new utterance
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'ar-SA';
-                utterance.rate = 1.0; // Slightly slower for clarity
+                utterance.rate = 1.0;
                 utterance.pitch = 1.2;
                 utterance.volume = 1.0;
 
-                // Select an Arabic voice if available
                 const voices = synth.getVoices();
                 const arabicVoice = voices.find(voice => voice.lang.includes('ar'));
                 if (arabicVoice) {
                     utterance.voice = arabicVoice;
                 }
 
-                // Handle speech synthesis errors
                 utterance.onerror = (event) => {
                     console.error('Speech synthesis error:', event.error);
                 };
@@ -352,7 +461,6 @@
             if (synth.getVoices().length > 0) {
                 initLevel();
             } else {
-                // Wait for voices to load
                 synth.onvoiceschanged = () => {
                     initLevel();
                 };
