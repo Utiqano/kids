@@ -392,12 +392,12 @@
 
         #game-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: clamp(12px, 3.5vw, 22px);
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: clamp(8px, 2vw, 15px);
             width: min(92vw, 82vh);
             height: min(72vh, 62vw);
-            max-width: clamp(220px, 82vw, 420px);
-            max-height: clamp(220px, 62vh, 420px);
+            max-width: clamp(220px, 82vw, 500px);
+            max-height: clamp(220px, 62vh, 500px);
             z-index: 2;
             position: relative;
             justify-content: center;
@@ -414,26 +414,26 @@
         /* Landscape */
         @media (orientation: landscape) and (min-width: 600px) {
             #game-container {
-                width: min(72vw, 420px);
-                height: min(52vh, 320px);
-                gap: clamp(18px, 2.5vw, 28px);
+                width: min(72vw, 500px);
+                height: min(52vh, 380px);
+                gap: clamp(12px, 2vw, 20px);
             }
         }
 
         .card {
             aspect-ratio: 1;
             background: linear-gradient(145deg, #F0F0F0, #E0E0E0);
-            border-radius: clamp(12px, 3.5vw, 22px);
+            border-radius: clamp(8px, 2.5vw, 18px);
             position: relative;
             cursor: pointer;
             transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1); /* Smoother easing: back-out */
             transform-style: preserve-3d;
-            box-shadow: 0 clamp(5px, 1.2vw, 9px) clamp(10px, 2.5vw, 18px) rgba(0,0,0,0.15);
+            box-shadow: 0 clamp(3px, 0.8vw, 6px) clamp(6px, 1.8vw, 12px) rgba(0,0,0,0.15);
         }
 
         .card:hover:not(:active) {
-            box-shadow: 0 clamp(7px, 1.8vw, 14px) clamp(14px, 3.5vw, 26px) rgba(0,0,0,0.25), 0 0 15px rgba(255,105,180,0.3);
-            transform: translateY(-5px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 clamp(5px, 1.2vw, 10px) clamp(10px, 2.5vw, 18px) rgba(0,0,0,0.25), 0 0 15px rgba(255,105,180,0.3);
+            transform: translateY(-3px) rotateX(5deg) rotateY(5deg);
         }
 
         .card.flipped {
@@ -445,8 +445,8 @@
         }
 
         @keyframes tapGlow {
-            0% { box-shadow: 0 clamp(5px,1.2vw,9px) clamp(10px,2.5vw,18px) rgba(0,0,0,0.15), 0 0 25px rgba(255,105,180,0.6); }
-            100% { box-shadow: 0 clamp(5px,1.2vw,9px) clamp(10px,2.5vw,18px) rgba(0,0,0,0.15), 0 0 clamp(25px,6vw,45px) rgba(255,105,180,1); }
+            0% { box-shadow: 0 clamp(3px,0.8vw,6px) clamp(6px,1.8vw,12px) rgba(0,0,0,0.15), 0 0 25px rgba(255,105,180,0.6); }
+            100% { box-shadow: 0 clamp(3px,0.8vw,6px) clamp(6px,1.8vw,12px) rgba(0,0,0,0.15), 0 0 clamp(25px,6vw,45px) rgba(255,105,180,1); }
         }
 
         .card-front, .card-back {
@@ -458,7 +458,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: clamp(2.2em, 13vw, 4.2em);
+            font-size: clamp(1.8em, 11vw, 3.5em);
         }
 
         .card-back {
@@ -468,7 +468,7 @@
 
         .card-front {
             background: linear-gradient(145deg, #FFFFFF, #FAFAFA);
-            box-shadow: inset 0 0 clamp(12px,2.5vw,22px) rgba(0,0,0,0.08);
+            box-shadow: inset 0 0 clamp(8px,2vw,18px) rgba(0,0,0,0.08);
         }
 
         /* Enhanced match: Bounce + glow + particles + explosion */
@@ -560,7 +560,7 @@
         /* Small screen tweaks */
         @media (max-width: 480px) {
             #game-container {
-                gap: 12px;
+                gap: 8px;
                 width: 92vw;
                 height: 52vh;
             }
@@ -573,10 +573,10 @@
         /* Large screen */
         @media (min-width: 768px) {
             #game-container {
-                grid-template-columns: repeat(2, minmax(110px, 1fr));
-                gap: 28px;
-                width: 520px;
-                height: 520px;
+                grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+                gap: 20px;
+                width: 600px;
+                height: 600px;
             }
             body {
                 justify-content: flex-start;
@@ -607,7 +607,7 @@
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         let flippedCards = [];
         let matchedPairs = 0;
-        const totalPairs = 2;
+        let totalPairs = 2;
         let currentLevel = parseInt(localStorage.getItem('matchyLevel')) || 1;
         let totalStars = parseInt(localStorage.getItem('matchyStars')) || 0;
         const maxLevels = 100; // Expanded to 100 levels
@@ -628,6 +628,18 @@
         };
 
         const emojiPool = Object.keys(emojiToName);
+
+        function updateTotalPairs() {
+            if (currentLevel > 80) {
+                totalPairs = 5; // 10 cards
+            } else if (currentLevel > 50) {
+                totalPairs = 4; // 8 cards
+            } else if (currentLevel > 25) {
+                totalPairs = 3; // 6 cards
+            } else {
+                totalPairs = 2; // 4 cards
+            }
+        }
 
         // Improved sound: Longer fanfare, better waveforms, added reverb-like decay
         function playSound(frequency = 440, duration = 0.2, type = 'single') {
@@ -724,6 +736,7 @@
             document.getElementById('next-btn').style.display = 'block';
             document.getElementById('star-btn').style.display = 'flex';
             document.getElementById('game-container').style.display = 'grid';
+            updateTotalPairs();
             generateCards();
             playSound(523.25, 0.5);
             if (audioContext.state === 'suspended') audioContext.resume();
@@ -733,13 +746,16 @@
             const container = document.getElementById('game-container');
             container.innerHTML = '';
             let selectedEmojis = [];
-            while (selectedEmojis.length < 2) {
+            while (selectedEmojis.length < totalPairs) {
                 const randomEmoji = emojiPool[Math.floor(Math.random() * emojiPool.length)];
                 if (!selectedEmojis.includes(randomEmoji)) {
                     selectedEmojis.push(randomEmoji);
                 }
             }
-            const cardTypes = [selectedEmojis[0], selectedEmojis[1], selectedEmojis[0], selectedEmojis[1]];
+            const cardTypes = [];
+            selectedEmojis.forEach(emoji => {
+                cardTypes.push(emoji, emoji);
+            });
             cardTypes.sort(() => Math.random() - 0.5);
             cardTypes.forEach((type, index) => {
                 const card = document.createElement('div');
@@ -881,6 +897,7 @@
             totalStars++;
             localStorage.setItem('matchyLevel', currentLevel);
             localStorage.setItem('matchyStars', totalStars);
+            updateTotalPairs();
             if (currentLevel % 10 === 0) {
                 createConfetti();
                 if (navigator.vibrate) navigator.vibrate(500);
@@ -898,6 +915,7 @@
             totalStars += 10; // Bonus stars for completing!
             localStorage.setItem('matchyLevel', currentLevel);
             localStorage.setItem('matchyStars', totalStars);
+            updateTotalPairs();
             document.getElementById('victory-screen').style.display = 'none';
             document.getElementById('next-btn').textContent = 'Next →';
             document.getElementById('next-btn').classList.remove('play-again');
@@ -983,6 +1001,7 @@
             lastTouchEnd = now;
         }, false);
 
+        updateTotalPairs();
         updateLevelDisplay();
         updateProgressBar();
         updateStarsDisplay();
