@@ -123,10 +123,35 @@
             transition: all 0.3s ease;
             border: 1px solid rgba(102, 126, 234, 0.2);
             flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shape-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.5), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+
+        .shape-container:hover::before {
+            animation: shine 0.6s ease-in-out;
+            opacity: 1;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
         .shape-container:hover {
-            transform: translateY(-3px);
+            transform: translateY(-3px) rotate(2deg);
             box-shadow: 0 6px 20px rgba(0,0,0,0.15);
             background: rgba(255, 255, 255, 0.85);
         }
@@ -149,6 +174,31 @@
             position: relative;
             overflow: hidden;
             border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .shape::after {
+            content: attr(data-emoji) ' ✨';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            font-size: 0.8em;
+            transition: opacity 0.3s;
+        }
+
+        .shape:hover::after {
+            opacity: 1;
+            animation: sparkle 1s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
         }
 
         .shape:nth-child(1) { animation-delay: 0.1s; }
@@ -174,8 +224,15 @@
         }
 
         .shape:hover {
-            transform: translateY(-5px) scale(1.05);
+            transform: translateY(-5px) scale(1.05) rotate(5deg);
             box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+            animation: wiggle 0.5s ease-in-out;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
         }
 
         .shape:active {
@@ -189,6 +246,8 @@
         .shape.fruits { background: linear-gradient(135deg, #f093fb, #f5576c); }
         .shape.weather { background: linear-gradient(135deg, #4facfe, #00f2fe); }
         .shape.objects { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .shape.food { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+        .shape.emotions { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
 
         .shape-label {
             font-size: clamp(10px, 3vw, 14px);
@@ -201,6 +260,12 @@
 
         .shape-container:hover .shape-label {
             color: #667eea;
+            animation: pulseText 0.5s infinite;
+        }
+
+        @keyframes pulseText {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         @keyframes fadeInUp {
@@ -246,6 +311,19 @@
             flex-shrink: 0;
         }
 
+        #target::after {
+            content: '🎯';
+            position: absolute;
+            font-size: 0.5em;
+            opacity: 0.5;
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.7; }
             50% { transform: scale(1.05); opacity: 0.9; }
@@ -255,18 +333,40 @@
             border-color: #ffd700;
             background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,215,0,0.1));
             transform: scale(1.05);
+            animation: glow 1s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 5px #ffd700; }
+            to { box-shadow: 0 0 20px #ffd700; }
         }
 
         #target.correct {
-            animation: celebrate 0.6s ease-out;
+            animation: celebrate 0.6s ease-out, fireworks 1s ease-out 0.5s;
             border-color: #4ade80;
             background: linear-gradient(135deg, rgba(74,222,128,0.4), rgba(74,222,128,0.2));
+            transform: scale(1.2);
         }
 
         @keyframes celebrate {
             0%, 100% { transform: scale(1) rotate(0deg); }
             25% { transform: scale(1.1) rotate(5deg); }
             75% { transform: scale(1.1) rotate(-5deg); }
+        }
+
+        @keyframes fireworks {
+            0% {
+                box-shadow: 
+                    0 0 10px #4ade80,
+                    0 0 20px #4ade80,
+                    0 0 30px #4ade80;
+            }
+            100% {
+                box-shadow: 
+                    0 0 20px #4ade80,
+                    0 0 40px #4ade80,
+                    0 0 60px #4ade80;
+            }
         }
 
         #level-display {
@@ -315,6 +415,24 @@
             width: 0%;
             transition: width 0.5s ease;
             border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         @media (max-width: 768px) {
@@ -417,7 +535,7 @@
             font-size: clamp(32px, 10vw, 48px);
             color: #4ade80;
             z-index: 200;
-            animation: fireworks 1s ease-out forwards;
+            animation: fireworks 1s ease-out forwards, bounceIn 0.6s ease-out;
             pointer-events: none;
         }
 
@@ -433,6 +551,41 @@
             100% {
                 opacity: 0;
                 transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 150;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #4ade80;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                opacity: 1;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx), var(--dy)) scale(0);
             }
         }
     </style>
@@ -451,6 +604,7 @@
             </div>
         </div>
     </div>
+    <div id="particles" class="particles"></div>
 
     <script>
         const categories = [
@@ -516,6 +670,24 @@
                     { id: 'clock', emoji: '⏰', name: 'ساعة' },
                     { id: 'pen', emoji: '🖊️', name: 'قلم' }
                 ]
+            },
+            {
+                name: 'Food',
+                items: [
+                    { id: 'pizza', emoji: '🍕', name: 'بيتزا' },
+                    { id: 'burger', emoji: '🍔', name: 'برغر' },
+                    { id: 'icecream', emoji: '🍦', name: 'آيس كريم' },
+                    { id: 'cake', emoji: '🎂', name: 'كيك' }
+                ]
+            },
+            {
+                name: 'Emotions',
+                items: [
+                    { id: 'happy', emoji: '😊', name: 'سعيد' },
+                    { id: 'sad', emoji: '😢', name: 'حزين' },
+                    { id: 'angry', emoji: '😠', name: 'غاضب' },
+                    { id: 'surprised', emoji: '😲', name: 'مفاجأ' }
+                ]
             }
         ];
 
@@ -524,6 +696,93 @@
         let currentCategory;
         let correctItem;
         const synth = window.speechSynthesis;
+
+        let audioContext;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playTone(frequency, duration, type = 'sine', volume = 0.3) {
+            if (!audioContext) return;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        function playSuccessSound(categoryIndex) {
+            initAudio();
+            const successTones = [
+                // Vary by category
+                [523, 659, 784], // C major chord for shapes
+                [440, 554, 659], // A minor for animals
+                [392, 494, 587], // G major for colors
+                [349, 440, 523], // F major for vehicles
+                [294, 370, 440], // D minor for fruits
+                [262, 330, 392], // C minor for weather
+                [220, 277, 330], // A minor low for objects
+                [196, 247, 294], // G minor for food
+                [174, 220, 261]  // F minor for emotions
+            ];
+            const tones = successTones[categoryIndex % successTones.length];
+            tones.forEach((freq, i) => {
+                setTimeout(() => playTone(freq, 0.15, 'sine', 0.3), i * 150);
+            });
+        }
+
+        function playFailureSound(categoryIndex) {
+            initAudio();
+            const failureTones = [
+                [200, 150, 100], // Descending for shapes
+                [300, 250, 200], // For animals
+                [400, 300, 200], // For colors
+                [250, 200, 150], // For vehicles
+                [350, 250, 150], // For fruits
+                [450, 350, 250], // For weather
+                [150, 100, 50],  // Low for objects
+                [500, 400, 300], // High for food
+                [100, 50, 25]    // Very low for emotions
+            ];
+            const tones = failureTones[categoryIndex % failureTones.length];
+            tones.forEach((freq, i) => {
+                setTimeout(() => playTone(freq, 0.2, 'square', 0.2), i * 100);
+            });
+        }
+
+        function playDragSound(categoryIndex) {
+            initAudio();
+            const dragTones = [
+                800, 600, 400, 1200, 900, 700, 1000, 500, 300
+            ];
+            const freq = dragTones[categoryIndex % dragTones.length];
+            playTone(freq, 0.1, 'sawtooth', 0.1);
+        }
+
+        function createParticles(x, y) {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.background = `hsl(${Math.random() * 60 + 120}, 100%, 50%)`;
+                const angle = (Math.PI * 2 * i) / 12;
+                const velocity = 100 + Math.random() * 100;
+                particle.style.setProperty('--dx', (Math.cos(angle) * velocity) + 'px');
+                particle.style.setProperty('--dy', (Math.sin(angle) * velocity) + 'px');
+                particlesContainer.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
 
         const itemsArea = document.getElementById('items-area');
         const target = document.getElementById('target');
@@ -538,6 +797,8 @@
                 target.innerHTML = '';
                 categoryHeader.innerHTML = '';
                 progressFill.style.width = '100%';
+                playSuccessSound(0);
+                createParticles(window.innerWidth / 2, window.innerHeight / 2);
                 return;
             }
 
@@ -555,8 +816,12 @@
                 shape.className = `shape ${currentCategory.name.toLowerCase()}`;
                 shape.id = item.id;
                 shape.textContent = item.emoji;
+                shape.setAttribute('data-emoji', item.emoji);
                 shape.draggable = true;
-                shape.addEventListener('dragstart', dragStart);
+                shape.addEventListener('dragstart', (e) => {
+                    dragStart(e);
+                    playDragSound(categories.indexOf(currentCategory));
+                });
                 shape.addEventListener('touchstart', touchStart, { passive: false });
 
                 const label = document.createElement('div');
@@ -587,6 +852,7 @@
 
         function touchStart(e) {
             e.preventDefault();
+            playDragSound(categories.indexOf(currentCategory));
             const touch = e.touches[0];
             const elem = e.target;
             elem.style.position = 'absolute';
@@ -620,6 +886,10 @@
         target.addEventListener('dragover', e => e.preventDefault());
         target.addEventListener('drop', e => {
             e.preventDefault();
+            const rect = target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            createParticles(e.clientX, e.clientY);
             const id = e.dataTransfer.getData('text/plain');
             checkDrop(id);
         });
@@ -632,16 +902,20 @@
         function checkDrop(id) {
             const droppedItem = currentCategory.items.find(item => item.id === id);
             speak(droppedItem.name);
+            const categoryIndex = categories.indexOf(currentCategory);
             if (id === correctItem.id) {
+                playSuccessSound(categoryIndex);
                 target.classList.add('correct');
-                showFeedback('✅ صحيح!');
+                showFeedback('✅ صحيح! 🎉');
+                createParticles(target.getBoundingClientRect().left + target.offsetWidth / 2, target.getBoundingClientRect().top + target.offsetHeight / 2);
                 setTimeout(() => {
                     target.classList.remove('correct');
                     currentLevel++;
                     initLevel();
                 }, 1500);
             } else {
-                showFeedback('❌ حاول مرة أخرى');
+                playFailureSound(categoryIndex);
+                showFeedback('❌ حاول مرة أخرى 😔');
                 setTimeout(() => {
                     document.querySelector('.correct-feedback').remove();
                 }, 1000);
