@@ -8,6 +8,7 @@
     <style>
         * {
             box-sizing: border-box;
+            touch-action: none; /* Prevent default touch behaviors like scrolling */
         }
 
         body {
@@ -22,9 +23,9 @@
             justify-content: flex-start;
             align-items: center;
             min-height: 100vh;
-            height: 100vh;
+            height: auto;
             color: #333;
-            overflow-y: auto; /* Allow scrolling if needed */
+            overflow-y: auto;
         }
 
         body::before {
@@ -59,7 +60,7 @@
 
         .star {
             position: absolute;
-            font-size: 1.5em; /* Reduced size for mobile */
+            font-size: 1.5em;
             animation: twinkle 2s infinite alternate;
         }
 
@@ -135,7 +136,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .right {
@@ -153,7 +154,7 @@
             padding: 20px;
             border-radius: 25px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.15), inset 0 0 20px rgba(255, 255, 255, 0.3);
-            max-height: calc(100% - 100px);
+            max-height: none;
             overflow-y: auto;
             direction: rtl;
             justify-content: center;
@@ -232,6 +233,7 @@
             border-radius: 50%;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.5);
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+            touch-action: none; /* Ensure touch events are captured */
         }
 
         .shape:hover {
@@ -261,6 +263,13 @@
         @keyframes confetti {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .shape.dragging {
+            opacity: 0.6;
+            transform: scale(1.2); /* Slightly larger during drag */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+            z-index: 100;
         }
 
         .shape-label {
@@ -317,11 +326,6 @@
             25% { transform: translateX(-5px); }
             50% { transform: translateX(5px); }
             75% { transform: translateX(-5px); }
-        }
-
-        .shape.dragging {
-            opacity: 0.6;
-            transform: scale(0.9) rotate(0deg);
         }
 
         .toast {
@@ -381,14 +385,14 @@
             }
 
             .shape {
-                width: 60px;
-                height: 60px;
-                font-size: 2em;
+                width: 70px;
+                height: 70px;
+                font-size: 2.5em;
             }
 
             .drop-zone {
-                width: 70px;
-                height: 70px;
+                width: 80px;
+                height: 80px;
             }
 
             h1 {
@@ -419,14 +423,14 @@
 
         @media (max-width: 480px) {
             .shape {
-                width: 50px;
-                height: 50px;
-                font-size: 1.5em;
+                width: 60px;
+                height: 60px;
+                font-size: 2em;
             }
 
             .drop-zone {
-                width: 60px;
-                height: 60px;
+                width: 70px;
+                height: 70px;
             }
 
             .middle {
@@ -780,6 +784,7 @@
         }
 
         function touchStart(e) {
+            if (e.touches.length > 1) return; // Ignore multi-touch
             e.preventDefault();
             const touch = e.touches[0];
             const solid = e.target;
@@ -787,18 +792,21 @@
             const rect = solid.getBoundingClientRect();
             solid.dataset.offsetX = touch.clientX - rect.left;
             solid.dataset.offsetY = touch.clientY - rect.top;
+            solid.dataset.startScrollY = window.scrollY; // Account for scroll position
         }
 
         function touchMove(e) {
+            if (e.touches.length > 1) return; // Ignore multi-touch
             e.preventDefault();
             const touch = e.touches[0];
             const solid = e.target;
             const offsetX = parseFloat(solid.dataset.offsetX) || 0;
             const offsetY = parseFloat(solid.dataset.offsetY) || 0;
+            const startScrollY = parseFloat(solid.dataset.startScrollY) || 0;
             solid.style.position = 'fixed';
             solid.style.left = `${touch.clientX - offsetX}px`;
-            solid.style.top = `${touch.clientY - offsetY}px`;
-            solid.style.zIndex = '10';
+            solid.style.top = `${touch.clientY - offsetY + startScrollY}px`;
+            solid.style.zIndex = '100';
         }
 
         function touchEnd(e) {
@@ -829,6 +837,7 @@
             solid.style.zIndex = '';
             delete solid.dataset.offsetX;
             delete solid.dataset.offsetY;
+            delete solid.dataset.startScrollY;
         }
 
         function dragOver(e) {
