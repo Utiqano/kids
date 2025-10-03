@@ -1,58 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kids Drag and Drop Game</title>
+    <title>لعبة السحب والإفلات للأطفال</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Comic Neue', cursive;
         }
 
         body {
             display: flex;
             min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            background: linear-gradient(135deg, #ffeb3b, #ff5722);
             overflow: hidden;
             touch-action: manipulation;
         }
 
         #sidebar {
-            width: 25%;
-            max-width: 250px;
-            background: #ffffff;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            width: min(25%, 250px);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: -4px 0 10px rgba(0,0,0,0.2);
             padding: 20px;
             overflow-y: auto;
             transition: transform 0.3s ease;
         }
 
         #sidebar.collapsed {
-            transform: translateX(-100%);
+            transform: translateX(100%);
         }
 
         #toggle-btn {
             position: fixed;
             top: 15px;
-            left: 15px;
+            right: 15px;
             z-index: 100;
-            background: #ff6b6b;
+            background: #ff4081;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
+            width: 45px;
+            height: 45px;
+            font-size: 24px;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
         }
 
         #toggle-btn:hover {
-            background: #ff8787;
+            background: #f50057;
+            transform: scale(1.1);
         }
 
         #main-area {
@@ -65,52 +65,111 @@
         }
 
         .shape {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             margin: 15px auto;
             cursor: grab;
             touch-action: none;
-            border-radius: 10px;
-            transition: transform 0.2s ease;
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 50px;
             text-align: center;
             user-select: none;
-            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: linear-gradient(45deg, #64b5f6, #81c784);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .shape:active {
-            transform: scale(0.95);
+        .shape:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        .shape.dragging {
+            animation: bounce 0.5s infinite alternate;
         }
 
         #target {
-            width: 120px;
-            height: 120px;
-            border: 3px solid #333;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+            width: 130px;
+            height: 130px;
+            border: 4px dashed #2196f3;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            font-size: 48px;
-            opacity: 0.4;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-size: 60px;
+            opacity: 0.25;
+            transition: transform 0.3s ease;
+        }
+
+        .correct-animation {
+            animation: zoomCelebrate 0.6s ease-in-out;
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        .shake-animation {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        @keyframes zoomCelebrate {
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); }
+            50% { transform: scale(1.3); box-shadow: 0 0 20px rgba(76, 175, 80, 1); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10;
         }
 
         #level-display {
             position: absolute;
             top: 20px;
-            right: 20px;
-            font-size: clamp(18px, 5vw, 22px);
-            color: #333;
-            background: rgba(255, 255, 255, 0.8);
+            left: 20px;
+            font-size: clamp(20px, 5vw, 24px);
+            color: #fff;
+            background: rgba(255, 87, 34, 0.8);
+            padding: 10px 20px;
+            border-radius: 25px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        #voice-message {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(16px, 4vw, 18px);
+            color: #fff;
+            background: rgba(244, 67, 54, 0.8);
             padding: 8px 16px;
             border-radius: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #voice-message.show {
+            opacity: 1;
         }
 
         @media (max-width: 600px) {
@@ -120,21 +179,26 @@
             }
 
             .shape {
-                width: 60px;
-                height: 60px;
-                font-size: 30px;
+                width: 70px;
+                height: 70px;
+                font-size: 40px;
             }
 
             #target {
-                width: 100px;
-                height: 100px;
-                font-size: 36px;
+                width: 110px;
+                height: 110px;
+                font-size: 50px;
             }
 
             #toggle-btn {
-                width: 35px;
-                height: 35px;
-                font-size: 18px;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            #level-display, #voice-message {
+                font-size: clamp(16px, 4vw, 18px);
+                padding: 8px 16px;
             }
         }
     </style>
@@ -145,8 +209,10 @@
         <!-- Shapes added dynamically -->
     </div>
     <div id="main-area">
+        <canvas id="particle-canvas"></canvas>
         <div id="target"></div>
-        <div id="level-display">Level: 1</div>
+        <div id="level-display">المستوى: 1</div>
+        <div id="voice-message"></div>
     </div>
 
     <script>
@@ -221,11 +287,62 @@
         let currentCategory;
         let correctItem;
         const synth = window.speechSynthesis;
+        let arabicVoice = null;
 
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggle-btn');
         const target = document.getElementById('target');
         const levelDisplay = document.getElementById('level-display');
+        const voiceMessage = document.getElementById('voice-message');
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Particle effect with confetti
+        let particles = [];
+        function createParticles(x, y) {
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    radius: Math.random() * 6 + 3,
+                    color: `hsl(${Math.random() * 360}, 80%, 60%)`,
+                    life: 30,
+                    shape: Math.random() > 0.5 ? 'circle' : 'square'
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles = particles.filter(p => p.life > 0);
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1;
+                p.life--;
+                p.radius *= 0.98;
+                ctx.beginPath();
+                if (p.shape === 'circle') {
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                } else {
+                    ctx.rect(p.x - p.radius, p.y - p.radius, p.radius * 2, p.radius * 2);
+                }
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            });
+            if (particles.length > 0) {
+                requestAnimationFrame(animateParticles);
+            }
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
@@ -234,7 +351,7 @@
 
         function initLevel() {
             if (currentLevel > maxLevels) {
-                levelDisplay.textContent = 'Game Completed!';
+                levelDisplay.textContent = 'اكتملت اللعبة!';
                 sidebar.innerHTML = '';
                 target.innerHTML = '';
                 return;
@@ -251,6 +368,7 @@
                 shape.textContent = item.emoji;
                 shape.draggable = true;
                 shape.addEventListener('dragstart', dragStart);
+                shape.addEventListener('dragend', dragEnd);
                 shape.addEventListener('touchstart', touchStart, { passive: false });
                 sidebar.appendChild(shape);
             });
@@ -259,17 +377,23 @@
 
             target.textContent = correctItem.emoji;
 
-            levelDisplay.textContent = `Level: ${currentLevel}`;
+            levelDisplay.textContent = `المستوى: ${currentLevel}`;
         }
 
         function dragStart(e) {
+            e.target.classList.add('dragging');
             e.dataTransfer.setData('text/plain', e.target.id);
+        }
+
+        function dragEnd(e) {
+            e.target.classList.remove('dragging');
         }
 
         function touchStart(e) {
             e.preventDefault();
             const touch = e.touches[0];
             const elem = e.target;
+            elem.classList.add('dragging');
             elem.style.position = 'absolute';
             elem.style.zIndex = 1000;
 
@@ -283,6 +407,7 @@
             function touchEnd(ev) {
                 document.removeEventListener('touchmove', touchMove);
                 document.removeEventListener('touchend', touchEnd);
+                elem.classList.remove('dragging');
                 const dropX = ev.changedTouches[0].clientX;
                 const dropY = ev.changedTouches[0].clientY;
                 if (isOverTarget(dropX, dropY)) {
@@ -314,58 +439,141 @@
             const droppedItem = currentCategory.items.find(item => item.id === id);
             speak(droppedItem.name);
             if (id === correctItem.id) {
-                currentLevel++;
-                setTimeout(initLevel, 1000);
+                target.classList.add('correct-animation');
+                const rect = target.getBoundingClientRect();
+                createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                animateParticles();
+                setTimeout(() => {
+                    target.classList.remove('correct-animation');
+                    currentLevel++;
+                    initLevel();
+                }, 1000);
+            } else {
+                target.classList.add('shake-animation');
+                setTimeout(() => {
+                    target.classList.remove('shake-animation');
+                }, 400);
             }
         }
 
         function speak(text) {
-            if (synth) {
-                // Cancel any ongoing speech to prevent overlap
-                synth.cancel();
-                
-                // Create new utterance
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ar-SA';
-                utterance.rate = 1.0; // Slightly slower for clarity
-                utterance.pitch = 1.2;
-                utterance.volume = 1.0;
+            if (!synth) {
+                showVoiceMessage('الصوت غير مدعوم في المتصفح 😢');
+                return;
+            }
 
-                // Select an Arabic voice if available
+            synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ar-SA';
+            utterance.rate = 1.0;
+            utterance.pitch = 1.2;
+            utterance.volume = 1.0;
+
+            if (arabicVoice) {
+                utterance.voice = arabicVoice;
+            } else {
+                showVoiceMessage('الصوت العربي غير متوفر 😢');
+                return;
+            }
+
+            utterance.onerror = (event) => {
+                showVoiceMessage('حدث خطأ في الصوت 😢');
+            };
+
+            utterance.onend = () => {
+                synth.cancel();
+            };
+
+            try {
+                synth.speak(utterance);
+            } catch (error) {
+                showVoiceMessage('خطأ في تشغيل الصوت 😢');
+            }
+        }
+
+        function showVoiceMessage(message) {
+            voiceMessage.textContent = message;
+            voiceMessage.classList.add('show');
+            setTimeout(() => {
+                voiceMessage.classList.remove('show');
+            }, 4000);
+        }
+
+        function loadArabicVoice() {
+            return new Promise((resolve) => {
                 const voices = synth.getVoices();
-                const arabicVoice = voices.find(voice => voice.lang.includes('ar'));
+                arabicVoice = voices.find(voice => voice.lang.includes('ar'));
                 if (arabicVoice) {
-                    utterance.voice = arabicVoice;
+                    resolve(true);
+                    return;
                 }
 
-                // Handle speech synthesis errors
-                utterance.onerror = (event) => {
-                    console.error('Speech synthesis error:', event.error);
-                };
+                let retryCount = 0;
+                const maxRetries = 5;
+                const retryInterval = setInterval(() => {
+                    const voices = synth.getVoices();
+                    arabicVoice = voices.find(voice => voice.lang.includes('ar'));
+                    if (arabicVoice || retryCount >= maxRetries) {
+                        clearInterval(retryInterval);
+                        resolve(!!arabicVoice);
+                    }
+                    retryCount++;
+                }, 1000);
 
-                synth.speak(utterance);
-            }
+                setTimeout(() => {
+                    clearInterval(retryInterval);
+                    if (!arabicVoice) {
+                        resolve(false);
+                    }
+                }, 7000);
+            });
         }
 
-        // Load voices and initialize level
-        function initVoices() {
-            if (synth.getVoices().length > 0) {
+        async function initVoices() {
+            if (!synth) {
+                showVoiceMessage('الصوت غير مدعوم في المتصفح 😢');
                 initLevel();
-            } else {
-                // Wait for voices to load
-                synth.onvoiceschanged = () => {
+                return;
+            }
+
+            const voices = synth.getVoices();
+            if (voices.length > 0) {
+                const success = await loadArabicVoice();
+                if (success) {
                     initLevel();
+                } else {
+                    showVoiceMessage('الصوت العربي غير متوفر، استمر بدون صوت 😊');
+                    initLevel();
+                }
+            } else {
+                synth.onvoiceschanged = async () => {
+                    synth.onvoiceschanged = null; // Prevent multiple triggers
+                    const success = await loadArabicVoice();
+                    if (success) {
+                        initLevel();
+                    } else {
+                        showVoiceMessage('الصوت العربي غير متوفر، استمر بدون صوت 😊');
+                        initLevel();
+                    }
                 };
+                setTimeout(() => {
+                    if (!arabicVoice && synth.getVoices().length === 0) {
+                        showVoiceMessage('الصوت العربي غير متوفر، استمر بدون صوت 😊');
+                        initLevel();
+                    }
+                }, 8000);
             }
         }
 
-        // Load Google Fonts
+        // Load Comic Neue font
         const link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap';
+        link.href = 'https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap';
         link.rel = 'stylesheet';
         document.head.appendChild(link);
 
-        // Initialize
+        // Adjust for RTL layout
+        document.documentElement.setAttribute('dir', 'rtl');
+
         initVoices();
     </script>
 </body>
