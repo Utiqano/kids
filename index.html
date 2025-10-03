@@ -95,13 +95,14 @@
             border-radius: 20px;
             border: 2px solid rgba(102, 126, 234, 0.3);
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        #category-header::after {
+        #category-header::before {
             content: '🎯';
-            position: absolute;
-            top: -10px;
-            right: -10px;
             font-size: 20px;
             animation: bounce 2s infinite;
         }
@@ -129,14 +130,93 @@
             }
         }
 
-        .shape-label {
+        .shape-container {
             text-align: center;
-            margin-top: 8px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .shape-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .shape {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 10px;
+            cursor: grab;
+            touch-action: none;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            text-align: center;
+            user-select: none;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .shape:nth-child(1) { animation-delay: 0.1s; }
+        .shape:nth-child(2) { animation-delay: 0.2s; }
+        .shape:nth-child(3) { animation-delay: 0.3s; }
+        .shape:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) translateY(30px);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .shape:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        }
+
+        .shape:active {
+            transform: scale(0.95);
+        }
+
+        .shape.shapes { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+        .shape.animals { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+        .shape.colors { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
+        .shape.vehicles { background: linear-gradient(135deg, #d299c2, #fef9d7); }
+        .shape.fruits { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        .shape.weather { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .shape.objects { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+        .shape-label {
             font-size: 14px;
             color: #4a5568;
-            font-weight: 500;
+            font-weight: 600;
             text-shadow: 0 1px 2px rgba(0,0,0,0.05);
             animation: fadeInUp 0.6s ease-out 0.2s both;
+            transition: color 0.3s ease;
+        }
+
+        .shape-container:hover .shape-label {
+            color: #667eea;
         }
 
         @keyframes fadeInUp {
@@ -184,66 +264,6 @@
             padding: 40px 20px;
             z-index: 2;
         }
-
-        .shape {
-            width: 90px;
-            height: 90px;
-            margin: 25px auto;
-            cursor: grab;
-            touch-action: none;
-            border-radius: 20px;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 45px;
-            text-align: center;
-            user-select: none;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            position: relative;
-            overflow: hidden;
-            animation: bounceIn 0.6s ease-out;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-
-        .shape:nth-child(1) { animation-delay: 0.1s; }
-        .shape:nth-child(2) { animation-delay: 0.2s; }
-        .shape:nth-child(3) { animation-delay: 0.3s; }
-        .shape:nth-child(4) { animation-delay: 0.4s; }
-
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3) translateY(30px);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-            70% {
-                transform: scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .shape:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-        }
-
-        .shape:active {
-            transform: scale(0.95);
-        }
-
-        .shape.shapes { background: linear-gradient(135deg, #a8edea, #fed6e3); }
-        .shape.animals { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
-        .shape.colors { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
-        .shape.vehicles { background: linear-gradient(135deg, #d299c2, #fef9d7); }
-        .shape.fruits { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .shape.weather { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .shape.objects { background: linear-gradient(135deg, #43e97b, #38f9d7); }
 
         #target {
             width: 140px;
@@ -344,13 +364,22 @@
             #category-header {
                 font-size: 22px;
                 padding: 12px 15px;
+                gap: 8px;
+            }
+
+            #category-header::before {
+                font-size: 18px;
+            }
+
+            .shape-container {
+                margin-bottom: 25px;
+                padding: 12px;
             }
 
             .shape {
                 width: 70px;
                 height: 70px;
                 font-size: 35px;
-                margin: 20px auto;
             }
 
             .shape-label {
@@ -509,7 +538,7 @@
                 levelDisplay.textContent = 'Game Completed! 🎉';
                 sidebar.innerHTML = '';
                 target.innerHTML = '';
-                categoryHeader.textContent = '';
+                categoryHeader.innerHTML = '';
                 progressFill.style.width = '100%';
                 return;
             }
@@ -518,11 +547,11 @@
             sidebar.innerHTML = '';
             target.innerHTML = '';
 
-            categoryHeader.textContent = currentCategory.name;
+            categoryHeader.innerHTML = currentCategory.name;
 
             currentCategory.items.forEach((item, index) => {
                 const shapeContainer = document.createElement('div');
-                shapeContainer.style.textAlign = 'center';
+                shapeContainer.className = 'shape-container';
 
                 const shape = document.createElement('div');
                 shape.className = `shape ${currentCategory.name.toLowerCase()}`;
@@ -622,6 +651,10 @@
         }
 
         function showFeedback(text) {
+            // Remove existing feedback if any
+            const existing = document.querySelector('.correct-feedback');
+            if (existing) existing.remove();
+            
             const feedback = document.createElement('div');
             feedback.className = 'correct-feedback';
             feedback.textContent = text;
