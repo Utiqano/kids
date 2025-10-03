@@ -13,12 +13,15 @@
         }
 
         body {
-            display: flex;
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             overflow: hidden;
             touch-action: manipulation;
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
         }
 
         body::before {
@@ -33,64 +36,43 @@
             z-index: 1;
         }
 
-        #sidebar {
-            width: 28%;
-            max-width: 320px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
-            backdrop-filter: blur(15px);
-            box-shadow: 6px 0 30px rgba(0,0,0,0.2);
-            padding: 40px 25px;
-            overflow-y: auto;
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            z-index: 10;
-            position: relative;
-            border-radius: 0 25px 25px 0;
-        }
-
-        #sidebar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
+        #game-container {
+            display: flex;
             width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at top left, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
-            z-index: -1;
-            border-radius: 0 25px 25px 0;
+            max-width: 900px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
         }
 
-        #sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #sidebar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 10px;
-        }
-
-        #sidebar::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #667eea, #764ba2);
-            border-radius: 10px;
-        }
-
-        #sidebar::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #5a67d8, #6b46c1);
-        }
-
-        #sidebar.collapsed {
-            transform: translateX(-100%);
+        #items-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: clamp(20px, 5vw, 40px);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+            border-right: 2px solid rgba(102, 126, 234, 0.2);
+            overflow-y: auto;
+            min-height: 0;
         }
 
         #category-header {
             text-align: center;
-            margin-bottom: 35px;
+            margin-bottom: clamp(15px, 4vw, 35px);
             color: #2d3748;
-            font-size: 26px;
+            font-size: clamp(18px, 5vw, 26px);
             font-weight: 700;
             text-shadow: 0 2px 4px rgba(0,0,0,0.1);
             animation: fadeInDown 0.6s ease-out;
             position: relative;
-            padding: 15px 20px;
+            padding: clamp(10px, 3vw, 15px) clamp(15px, 4vw, 20px);
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
             border-radius: 20px;
             border: 2px solid rgba(102, 126, 234, 0.3);
@@ -98,12 +80,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: clamp(5px, 2vw, 10px);
+            flex-shrink: 0;
         }
 
         #category-header::before {
             content: '🎯';
-            font-size: 20px;
+            font-size: clamp(16px, 4vw, 20px);
             animation: bounce 2s infinite;
         }
 
@@ -132,13 +115,14 @@
 
         .shape-container {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 15px;
+            margin-bottom: clamp(15px, 4vw, 30px);
+            padding: clamp(10px, 3vw, 15px);
             background: rgba(255, 255, 255, 0.7);
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             border: 1px solid rgba(102, 126, 234, 0.2);
+            flex-shrink: 0;
         }
 
         .shape-container:hover {
@@ -148,9 +132,9 @@
         }
 
         .shape {
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 10px;
+            width: clamp(60px, 12vw, 90px);
+            height: clamp(60px, 12vw, 90px);
+            margin: 0 auto 8px;
             cursor: grab;
             touch-action: none;
             border-radius: 20px;
@@ -158,7 +142,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 45px;
+            font-size: clamp(30px, 8vw, 45px);
             text-align: center;
             user-select: none;
             box-shadow: 0 6px 20px rgba(0,0,0,0.15);
@@ -207,7 +191,7 @@
         .shape.objects { background: linear-gradient(135deg, #43e97b, #38f9d7); }
 
         .shape-label {
-            font-size: 14px;
+            font-size: clamp(10px, 3vw, 14px);
             color: #4a5568;
             font-weight: 600;
             text-shadow: 0 1px 2px rgba(0,0,0,0.05);
@@ -230,30 +214,6 @@
             }
         }
 
-        #toggle-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 22px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-
-        #toggle-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
-            background: linear-gradient(135deg, #ff8787, #ff6b6b);
-        }
-
         #main-area {
             flex: 1;
             display: flex;
@@ -261,13 +221,15 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            padding: 40px 20px;
-            z-index: 2;
+            padding: clamp(20px, 5vw, 40px);
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            backdrop-filter: blur(5px);
+            min-height: 0;
         }
 
         #target {
-            width: 140px;
-            height: 140px;
+            width: clamp(100px, 20vw, 140px);
+            height: clamp(100px, 20vw, 140px);
             border: 4px dashed #fff;
             background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
             border-radius: 25px;
@@ -276,11 +238,12 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            font-size: 55px;
+            font-size: clamp(30px, 10vw, 55px);
             opacity: 0.7;
             transition: all 0.3s ease;
             animation: pulse 2s infinite;
             backdrop-filter: blur(5px);
+            flex-shrink: 0;
         }
 
         @keyframes pulse {
@@ -308,13 +271,13 @@
 
         #level-display {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: clamp(20px, 5vw, 24px);
+            top: clamp(10px, 3vw, 20px);
+            right: clamp(10px, 3vw, 20px);
+            font-size: clamp(16px, 4vw, 24px);
             color: #fff;
             background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
             backdrop-filter: blur(10px);
-            padding: 12px 20px;
+            padding: clamp(8px, 2vw, 12px) clamp(15px, 4vw, 20px);
             border-radius: 30px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             border: 1px solid rgba(255,255,255,0.3);
@@ -335,11 +298,11 @@
 
         .progress-bar {
             position: absolute;
-            bottom: 20px;
+            bottom: clamp(10px, 3vw, 20px);
             left: 50%;
             transform: translateX(-50%);
-            width: 80%;
-            height: 8px;
+            width: clamp(60%, 80vw, 80%);
+            height: clamp(6px, 2vw, 8px);
             background: rgba(255,255,255,0.2);
             border-radius: 4px;
             overflow: hidden;
@@ -354,55 +317,95 @@
             border-radius: 4px;
         }
 
-        @media (max-width: 600px) {
-            #sidebar {
-                width: 50%;
-                max-width: 280px;
-                padding: 30px 20px;
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+
+            #game-container {
+                flex-direction: column;
+                height: 95vh;
+                border-radius: 20px;
+            }
+
+            #items-area {
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                padding: clamp(15px, 5vw, 20px);
+                border-right: none;
+                border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+                height: auto;
+                overflow-x: auto;
+                overflow-y: hidden;
+                gap: clamp(10px, 3vw, 15px);
             }
 
             #category-header {
-                font-size: 22px;
-                padding: 12px 15px;
-                gap: 8px;
-            }
-
-            #category-header::before {
-                font-size: 18px;
+                position: absolute;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                margin-bottom: 0;
+                z-index: 20;
+                width: auto;
+                max-width: 90%;
             }
 
             .shape-container {
-                margin-bottom: 25px;
-                padding: 12px;
+                margin-bottom: 0;
+                flex: 0 0 auto;
+                min-width: clamp(80px, 20vw, 100px);
             }
 
-            .shape {
-                width: 70px;
-                height: 70px;
-                font-size: 35px;
-            }
-
-            .shape-label {
-                font-size: 12px;
+            #main-area {
+                height: auto;
+                padding: clamp(10px, 4vw, 20px);
+                justify-content: center;
+                flex: 1;
             }
 
             #target {
-                width: 110px;
-                height: 110px;
-                font-size: 40px;
+                margin-top: clamp(20px, 5vw, 40px);
             }
 
-            #toggle-btn {
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
+            .progress-bar {
+                bottom: 5px;
+                width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #items-area {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .shape-container {
+                padding: 8px;
+            }
+
+            .shape {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+
+            .shape-label {
+                font-size: 10px;
+            }
+
+            #target {
+                width: 90px;
+                height: 90px;
+                font-size: 32px;
             }
 
             #level-display {
-                top: 15px;
-                right: 15px;
-                padding: 10px 15px;
-                font-size: 18px;
+                top: 5px;
+                right: 5px;
+                padding: 6px 10px;
+                font-size: 14px;
             }
         }
 
@@ -411,7 +414,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 48px;
+            font-size: clamp(32px, 10vw, 48px);
             color: #4ade80;
             z-index: 200;
             animation: fireworks 1s ease-out forwards;
@@ -435,16 +438,17 @@
     </style>
 </head>
 <body>
-    <button id="toggle-btn">☰</button>
-    <div id="sidebar">
-        <h2 id="category-header"></h2>
-        <!-- Shapes added dynamically -->
-    </div>
-    <div id="main-area">
-        <div id="target"></div>
-        <div id="level-display">Level: 1</div>
-        <div class="progress-bar">
-            <div id="progress-fill" class="progress-fill"></div>
+    <div id="game-container">
+        <div id="items-area">
+            <h2 id="category-header"></h2>
+            <!-- Shapes added dynamically -->
+        </div>
+        <div id="main-area">
+            <div id="target"></div>
+            <div id="level-display">Level: 1</div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
         </div>
     </div>
 
@@ -521,22 +525,16 @@
         let correctItem;
         const synth = window.speechSynthesis;
 
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('toggle-btn');
+        const itemsArea = document.getElementById('items-area');
         const target = document.getElementById('target');
         const levelDisplay = document.getElementById('level-display');
         const categoryHeader = document.getElementById('category-header');
         const progressFill = document.getElementById('progress-fill');
 
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '☰' : '✖';
-        });
-
         function initLevel() {
             if (currentLevel > maxLevels) {
                 levelDisplay.textContent = 'Game Completed! 🎉';
-                sidebar.innerHTML = '';
+                itemsArea.innerHTML = '<h2 id="category-header"></h2>';
                 target.innerHTML = '';
                 categoryHeader.innerHTML = '';
                 progressFill.style.width = '100%';
@@ -544,7 +542,7 @@
             }
 
             currentCategory = categories[Math.floor(Math.random() * categories.length)];
-            sidebar.innerHTML = '';
+            itemsArea.innerHTML = '';
             target.innerHTML = '';
 
             categoryHeader.innerHTML = currentCategory.name;
@@ -567,7 +565,7 @@
 
                 shapeContainer.appendChild(shape);
                 shapeContainer.appendChild(label);
-                sidebar.appendChild(shapeContainer);
+                itemsArea.appendChild(shapeContainer);
             });
 
             correctItem = currentCategory.items[Math.floor(Math.random() * currentCategory.items.length)];
