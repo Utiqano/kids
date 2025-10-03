@@ -408,6 +408,7 @@
             backdrop-filter: blur(5px);
             border: 2px solid rgba(255,255,255,0.2);
             display: none;
+            perspective: 1000px; /* Enhanced 3D depth for smoother flips */
         }
 
         /* Landscape */
@@ -425,7 +426,7 @@
             border-radius: clamp(12px, 3.5vw, 22px);
             position: relative;
             cursor: pointer;
-            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1); /* Smoother easing: back-out */
             transform-style: preserve-3d;
             box-shadow: 0 clamp(5px, 1.2vw, 9px) clamp(10px, 2.5vw, 18px) rgba(0,0,0,0.15);
         }
