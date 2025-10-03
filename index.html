@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Kids Drag and Drop Game</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -15,44 +18,154 @@
         body {
             display: flex;
             min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             overflow: hidden;
             touch-action: manipulation;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Loading spinner */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            z-index: 1000;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         #sidebar {
             width: 25%;
-            max-width: 250px;
-            background: #ffffff;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            padding: 20px;
+            max-width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            padding: 30px 20px;
             overflow-y: auto;
-            transition: transform 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-right: 1px solid rgba(255,255,255,0.2);
         }
 
         #sidebar.collapsed {
             transform: translateX(-100%);
         }
 
+        .category-header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0;
+            animation: slideInUp 0.6s ease forwards;
+        }
+
+        .shape {
+            width: 90px;
+            height: 90px;
+            margin: 12px auto;
+            cursor: grab;
+            touch-action: none;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            text-align: center;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideInUp 0.6s ease forwards;
+        }
+
+        .shape:nth-child(1) { animation-delay: 0.1s; }
+        .shape:nth-child(2) { animation-delay: 0.2s; }
+        .shape:nth-child(3) { animation-delay: 0.3s; }
+        .shape:nth-child(4) { animation-delay: 0.4s; }
+
+        .shape::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .shape:hover::before {
+            left: 100%;
+        }
+
+        .shape:active {
+            transform: scale(0.92) rotate(5deg);
+        }
+
+        .shape[data-category="Shapes"] { background: linear-gradient(45deg, #ff9a9e, #fecfef); }
+        .shape[data-category="Animals"] { background: linear-gradient(45deg, #a8edea, #fed6e3); }
+        .shape[data-category="Colors"] { background: linear-gradient(45deg, #ffecd2, #fcb69f); }
+        .shape[data-category="Vehicles"] { background: linear-gradient(45deg, #a1c4fd, #c2e9fb); }
+        .shape[data-category="Fruits"] { background: linear-gradient(45deg, #ffecd2, #fcb69f); }
+        .shape[data-category="Weather"] { background: linear-gradient(45deg, #a8edea, #fed6e3); }
+        .shape[data-category="Objects"] { background: linear-gradient(45deg, #d299c2, #fef9d7); }
+
         #toggle-btn {
             position: fixed;
-            top: 15px;
-            left: 15px;
+            top: 20px;
+            left: 20px;
             z-index: 100;
-            background: #ff6b6b;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
+            width: 50px;
+            height: 50px;
+            font-size: 22px;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            backdrop-filter: blur(10px);
         }
 
         #toggle-btn:hover {
-            background: #ff8787;
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 25px rgba(255,107,107,0.5);
         }
 
         #main-area {
@@ -61,85 +174,179 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            padding: 20px;
-        }
-
-        .shape {
-            width: 80px;
-            height: 80px;
-            margin: 15px auto;
-            cursor: grab;
-            touch-action: none;
-            border-radius: 10px;
-            transition: transform 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            text-align: center;
-            user-select: none;
-            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .shape:active {
-            transform: scale(0.95);
+            padding: 30px;
         }
 
         #target {
-            width: 120px;
-            height: 120px;
-            border: 3px solid #333;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+            width: 140px;
+            height: 140px;
+            border: 4px dashed #fff;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            font-size: 48px;
-            opacity: 0.4;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+            font-size: 55px;
+            opacity: 0.7;
+            transition: all 0.4s ease;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 12px 40px rgba(0,0,0,0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 16px 50px rgba(255,255,255,0.3); }
+        }
+
+        #target.correct {
+            animation: celebrate 0.6s ease infinite;
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.2);
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(5deg); }
+            75% { transform: scale(1.1) rotate(-5deg); }
         }
 
         #level-display {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: clamp(18px, 5vw, 22px);
-            color: #333;
-            background: rgba(255, 255, 255, 0.8);
-            padding: 8px 16px;
-            border-radius: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            top: 25px;
+            right: 25px;
+            font-size: clamp(20px, 5vw, 24px);
+            font-weight: 700;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: slideInDown 0.6s ease forwards;
+        }
+
+        #level-display:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-20px) scale(1.05);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            pointer-events: none;
+            z-index: 200;
+            animation: confetti-fall 1s linear forwards;
+        }
+
+        .confetti:nth-child(odd) { background: #4ecdc4; animation-delay: 0.1s; }
+        .confetti:nth-child(even) { background: #ffd93d; animation-delay: 0.2s; }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #progress-bar {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d, #2c7744);
+            width: 2%;
+            transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
         @media (max-width: 600px) {
             #sidebar {
-                width: 40%;
-                max-width: 200px;
+                width: 45%;
+                max-width: 220px;
+                padding: 20px 15px;
             }
 
             .shape {
-                width: 60px;
-                height: 60px;
-                font-size: 30px;
+                width: 70px;
+                height: 70px;
+                font-size: 35px;
             }
 
             #target {
-                width: 100px;
-                height: 100px;
-                font-size: 36px;
+                width: 110px;
+                height: 110px;
+                font-size: 40px;
             }
 
             #toggle-btn {
-                width: 35px;
-                height: 35px;
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+
+            #level-display {
+                top: 15px;
+                right: 15px;
+                padding: 10px 15px;
                 font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
+    <div class="loading" id="loading">🎮</div>
     <button id="toggle-btn">☰</button>
     <div id="sidebar">
         <!-- Shapes added dynamically -->
@@ -147,226 +354,9 @@
     <div id="main-area">
         <div id="target"></div>
         <div id="level-display">Level: 1</div>
+        <div id="progress-bar">
+            <div id="progress-fill"></div>
+        </div>
     </div>
-
-    <script>
-        const categories = [
-            {
-                name: 'Shapes',
-                items: [
-                    { id: 'star', emoji: '⭐', name: 'نجمة' },
-                    { id: 'square', emoji: '⬛', name: 'مربع' },
-                    { id: 'circle', emoji: '⚪', name: 'دائرة' },
-                    { id: 'triangle', emoji: '🔺', name: 'مثلث' }
-                ]
-            },
-            {
-                name: 'Animals',
-                items: [
-                    { id: 'dog', emoji: '🐶', name: 'كلب' },
-                    { id: 'cat', emoji: '🐱', name: 'قطة' },
-                    { id: 'bird', emoji: '🐦', name: 'طائر' },
-                    { id: 'fish', emoji: '🐟', name: 'سمكة' }
-                ]
-            },
-            {
-                name: 'Colors',
-                items: [
-                    { id: 'red', emoji: '🔴', name: 'أحمر' },
-                    { id: 'blue', emoji: '🔵', name: 'أزرق' },
-                    { id: 'green', emoji: '🟢', name: 'أخضر' },
-                    { id: 'yellow', emoji: '🟡', name: 'أصفر' }
-                ]
-            },
-            {
-                name: 'Vehicles',
-                items: [
-                    { id: 'car', emoji: '🚗', name: 'سيارة' },
-                    { id: 'truck', emoji: '🚚', name: 'شاحنة' },
-                    { id: 'bike', emoji: '🚲', name: 'دراجة' },
-                    { id: 'plane', emoji: '✈️', name: 'طائرة' }
-                ]
-            },
-            {
-                name: 'Fruits',
-                items: [
-                    { id: 'apple', emoji: '🍎', name: 'تفاحة' },
-                    { id: 'banana', emoji: '🍌', name: 'موزة' },
-                    { id: 'orange', emoji: '🍊', name: 'برتقالة' },
-                    { id: 'grape', emoji: '🍇', name: 'عنب' }
-                ]
-            },
-            {
-                name: 'Weather',
-                items: [
-                    { id: 'sun', emoji: '☀️', name: 'شمس' },
-                    { id: 'cloud', emoji: '☁️', name: 'غيمة' },
-                    { id: 'rain', emoji: '🌧️', name: 'مطر' },
-                    { id: 'snow', emoji: '❄️', name: 'ثلج' }
-                ]
-            },
-            {
-                name: 'Objects',
-                items: [
-                    { id: 'ball', emoji: '⚽', name: 'كرة' },
-                    { id: 'book', emoji: '📚', name: 'كتاب' },
-                    { id: 'clock', emoji: '⏰', name: 'ساعة' },
-                    { id: 'pen', emoji: '🖊️', name: 'قلم' }
-                ]
-            }
-        ];
-
-        let currentLevel = 1;
-        const maxLevels = 50;
-        let currentCategory;
-        let correctItem;
-        const synth = window.speechSynthesis;
-
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('toggle-btn');
-        const target = document.getElementById('target');
-        const levelDisplay = document.getElementById('level-display');
-
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '☰' : '✖';
-        });
-
-        function initLevel() {
-            if (currentLevel > maxLevels) {
-                levelDisplay.textContent = 'Game Completed!';
-                sidebar.innerHTML = '';
-                target.innerHTML = '';
-                return;
-            }
-
-            currentCategory = categories[Math.floor(Math.random() * categories.length)];
-            sidebar.innerHTML = '';
-            target.innerHTML = '';
-
-            currentCategory.items.forEach(item => {
-                const shape = document.createElement('div');
-                shape.className = 'shape';
-                shape.id = item.id;
-                shape.textContent = item.emoji;
-                shape.draggable = true;
-                shape.addEventListener('dragstart', dragStart);
-                shape.addEventListener('touchstart', touchStart, { passive: false });
-                sidebar.appendChild(shape);
-            });
-
-            correctItem = currentCategory.items[Math.floor(Math.random() * currentCategory.items.length)];
-
-            target.textContent = correctItem.emoji;
-
-            levelDisplay.textContent = `Level: ${currentLevel}`;
-        }
-
-        function dragStart(e) {
-            e.dataTransfer.setData('text/plain', e.target.id);
-        }
-
-        function touchStart(e) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const elem = e.target;
-            elem.style.position = 'absolute';
-            elem.style.zIndex = 1000;
-
-            function touchMove(ev) {
-                ev.preventDefault();
-                const touch = ev.touches[0];
-                elem.style.left = `${touch.clientX - elem.offsetWidth / 2}px`;
-                elem.style.top = `${touch.clientY - elem.offsetHeight / 2}px`;
-            }
-
-            function touchEnd(ev) {
-                document.removeEventListener('touchmove', touchMove);
-                document.removeEventListener('touchend', touchEnd);
-                const dropX = ev.changedTouches[0].clientX;
-                const dropY = ev.changedTouches[0].clientY;
-                if (isOverTarget(dropX, dropY)) {
-                    checkDrop(elem.id);
-                } else {
-                    elem.style.position = '';
-                    elem.style.left = '';
-                    elem.style.top = '';
-                }
-            }
-
-            document.addEventListener('touchmove', touchMove, { passive: false });
-            document.addEventListener('touchend', touchEnd, { passive: false });
-        }
-
-        target.addEventListener('dragover', e => e.preventDefault());
-        target.addEventListener('drop', e => {
-            e.preventDefault();
-            const id = e.dataTransfer.getData('text/plain');
-            checkDrop(id);
-        });
-
-        function isOverTarget(x, y) {
-            const rect = target.getBoundingClientRect();
-            return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-        }
-
-        function checkDrop(id) {
-            const droppedItem = currentCategory.items.find(item => item.id === id);
-            speak(droppedItem.name);
-            if (id === correctItem.id) {
-                currentLevel++;
-                setTimeout(initLevel, 1000);
-            }
-        }
-
-        function speak(text) {
-            if (synth) {
-                // Cancel any ongoing speech to prevent overlap
-                synth.cancel();
-                
-                // Create new utterance
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ar-SA';
-                utterance.rate = 1.0; // Slightly slower for clarity
-                utterance.pitch = 1.2;
-                utterance.volume = 1.0;
-
-                // Select an Arabic voice if available
-                const voices = synth.getVoices();
-                const arabicVoice = voices.find(voice => voice.lang.includes('ar'));
-                if (arabicVoice) {
-                    utterance.voice = arabicVoice;
-                }
-
-                // Handle speech synthesis errors
-                utterance.onerror = (event) => {
-                    console.error('Speech synthesis error:', event.error);
-                };
-
-                synth.speak(utterance);
-            }
-        }
-
-        // Load voices and initialize level
-        function initVoices() {
-            if (synth.getVoices().length > 0) {
-                initLevel();
-            } else {
-                // Wait for voices to load
-                synth.onvoiceschanged = () => {
-                    initLevel();
-                };
-            }
-        }
-
-        // Load Google Fonts
-        const link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap';
-        link.rel = 'stylesheet';
-        document.head.appendChild(link);
-
-        // Initialize
-        initVoices();
-    </script>
 </body>
 </html>
