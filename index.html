@@ -3,1249 +3,612 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kids Drag and Drop Game</title>
+    <title>Matchy Pairs: Spot the Twins! (Manual Advance)</title>
     <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #4ade80;
-            --error-color: #ef4444;
-            --hover-glow: 0 0 20px rgba(255, 215, 0, 0.5);
-            --shape-glow: 0 0 15px rgba(0, 0, 0, 0.3);
-            --level-bg: linear-gradient(135deg, #ffd700, #ffed4a);
-            --kid-bg1: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
-            --kid-bg2: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            --kid-bg3: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-        }
-
-        * {
+        /* Polished responsive styles with improved design */
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-            background: var(--primary-gradient);
             overflow: hidden;
-            touch-action: manipulation;
-            position: relative;
+            background: linear-gradient(135deg, #87CEEB 0%, #98FB98 25%, #FFB6C1 50%, #FFD700 75%, #FF69B4 100%); /* Softer rainbow */
+            background-size: 300% 300%;
+            animation: bgShift 8s ease infinite; /* Smoother shift */
+            font-family: 'Comic Sans MS', cursive;
+            user-select: none;
+            touch-action: none;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 10px;
-            animation: backgroundShift 15s ease-in-out infinite alternate; /* Slower shift for calmer feel */
+            height: 100vh;
+            color: #333;
+            position: relative;
         }
 
-        @keyframes backgroundShift {
-            0% { background: var(--primary-gradient); }
-            33% { background: var(--kid-bg1); }
-            66% { background: var(--kid-bg2); }
-            100% { background: var(--kid-bg3); }
+        @keyframes bgShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        body::before {
-            content: '';
-            position: absolute;
+        /* Enhanced sparkles */
+        #sparkles {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1" fill="rgba(255,255,255,0.1)"/></pattern><pattern id="clouds" width="50" height="20" patternUnits="userSpaceOnUse"><path d="M10 10 Q15 5 20 10 T30 10" stroke="rgba(255,255,255,0.3)" fill="none" stroke-width="2"/></pattern></defs><rect width="100" height="100" fill="url(%23stars)"/><circle cx="20" cy="20" r="3" fill="rgba(255,192,203,0.2)" opacity="0.8" style="animation: floatCloud 20s linear infinite;"/><circle cx="80" cy="15" r="2" fill="rgba(255,192,203,0.2)" opacity="0.8" style="animation: floatCloud 25s linear infinite reverse;"/></svg>');
             pointer-events: none;
             z-index: 1;
-            animation: starTwinkle 4s linear infinite;
         }
-
-        @keyframes starTwinkle {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        @keyframes floatCloud {
-            0% { transform: translateX(-100px) translateY(0); }
-            100% { transform: translateX(100px) translateY(10px); }
-        }
-
-        #game-container {
-            display: flex;
-            width: 100%;
-            max-width: 900px;
-            height: 90vh;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            border-radius: 25px;
-            overflow: hidden;
-            position: relative;
-            z-index: 10;
-            animation: containerFloat 8s ease-in-out infinite; /* Slower float */
-        }
-
-        @keyframes containerFloat {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            25% { transform: translateY(-5px) rotate(1deg); }
-            50% { transform: translateY(-10px) rotate(0deg); }
-            75% { transform: translateY(-5px) rotate(-1deg); }
-        }
-
-        #items-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: clamp(20px, 5vw, 40px);
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
-            border-right: 2px solid rgba(102, 126, 234, 0.2);
-            overflow-y: auto;
-            min-height: 0;
-            position: relative;
-        }
-
-        #items-area::before {
-            content: '';
+        .sparkle {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            animation: bgPulse 5s ease-in-out infinite alternate; /* Slower pulse */
+            width: clamp(3px, 0.6vw, 5px);
+            height: clamp(3px, 0.6vw, 5px);
+            background: radial-gradient(circle, #FFD700, #FFA500);
+            border-radius: 50%;
+            animation: twinkle 1.5s infinite alternate;
+            box-shadow: 0 0 5px rgba(255,215,0,0.5);
         }
-
-        @keyframes bgPulse {
-            0% { opacity: 0.5; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.02); }
-        }
-
-        #category-header {
-            text-align: center;
-            margin-bottom: clamp(15px, 4vw, 35px);
-            color: #2d3748;
-            font-size: clamp(18px, 5vw, 26px);
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            animation: fadeInDown 0.8s ease-out; /* Slightly longer */
-            position: relative;
-            padding: clamp(10px, 3vw, 15px) clamp(15px, 4vw, 20px);
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
-            border-radius: 20px;
-            border: 2px solid rgba(102, 126, 234, 0.3);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: clamp(5px, 2vw, 10px);
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-        }
-
-        #category-header:hover {
-            transform: scale(1.05) rotate(2deg); /* Added rotate for fun */
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
-        }
-
-        #category-header::before {
-            content: '🎯';
-            font-size: clamp(16px, 4vw, 20px);
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0) scale(1);
-            }
-            40% {
-                transform: translateY(-10px) scale(1.1);
-            }
-            60% {
-                transform: translateY(-5px) scale(1.05);
-            }
-        }
-
-        .shape-container {
-            text-align: center;
-            margin-bottom: clamp(15px, 4vw, 30px);
-            padding: clamp(10px, 3vw, 15px);
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-            animation: containerSlideIn 1s ease-out forwards; /* Longer slide */
-            opacity: 0;
-            transform: translateX(-50px);
-        }
-
-        .shape-container:nth-child(1) { animation-delay: 0.2s; }
-        .shape-container:nth-child(2) { animation-delay: 0.4s; }
-        .shape-container:nth-child(3) { animation-delay: 0.6s; }
-        .shape-container:nth-child(4) { animation-delay: 0.8s; }
-
-        @keyframes containerSlideIn {
-            to {
-                opacity: 1;
-                transform: translateX(0) rotate(360deg); /* Added full rotate for entry */
-            }
-        }
-
-        .shape-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.5), transparent);
-            transform: rotate(45deg);
-            transition: all 0.6s;
-            opacity: 0;
-        }
-
-        .shape-container:hover::before {
-            animation: shine 0.8s ease-in-out; /* Longer shine */
-            opacity: 1;
-        }
-
-        @keyframes shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        .shape-container:hover {
-            transform: translateY(-3px) rotate(2deg) scale(1.05);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2), var(--hover-glow);
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .shape {
-            width: clamp(60px, 12vw, 90px);
-            height: clamp(60px, 12vw, 90px);
-            margin: 0 auto 8px;
-            cursor: grab;
-            touch-action: none;
-            border-radius: 20px;
-            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(30px, 8vw, 45px);
-            text-align: center;
-            user-select: none;
-            box-shadow: var(--shape-glow);
-            position: relative;
-            overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.3);
-            animation: shapePulse 3s ease-in-out infinite alternate; /* Slower pulse */
-        }
-
-        .shape:nth-child(1) { animation-delay: 0.1s; }
-        .shape:nth-child(2) { animation-delay: 0.3s; }
-        .shape:nth-child(3) { animation-delay: 0.5s; }
-        .shape:nth-child(4) { animation-delay: 0.7s; }
-
-        @keyframes shapePulse {
-            0% { box-shadow: var(--shape-glow), 0 0 10px rgba(255, 215, 0, 0.2); } /* Added glow variation */
-            100% { box-shadow: 0 0 25px rgba(0,0,0,0.4), 0 0 20px rgba(255, 215, 0, 0.4); }
-        }
-
-        .shape::after {
-            content: attr(data-emoji) ' ✨';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            font-size: 0.8em;
-            transition: opacity 0.3s;
-        }
-
-        .shape:hover::after {
-            opacity: 1;
-            animation: sparkle 1.5s infinite; /* Longer sparkle */
-        }
-
-        @keyframes sparkle {
-            0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
-            25% { opacity: 1; transform: scale(0.5) rotate(90deg); }
-            50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
-            75% { opacity: 1; transform: scale(0.8) rotate(270deg); }
-        }
-
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3) translateY(30px) rotate(-180deg);
-            }
-            50% {
-                transform: scale(1.05) rotate(90deg);
-            }
-            70% {
-                transform: scale(0.9) rotate(0deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0) rotate(360deg);
-            }
-        }
-
-        .shape:hover {
-            transform: translateY(-5px) scale(1.05) rotate(5deg);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.25), var(--hover-glow);
-            animation: wiggle 0.6s ease-in-out; /* Longer wiggle */
-        }
-
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(5deg); }
-            50% { transform: rotate(-5deg); }
-            75% { transform: rotate(3deg); }
-        }
-
-        .shape:active {
-            transform: scale(0.95);
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .shape.shapes { background: linear-gradient(135deg, #a8edea, #fed6e3); }
-        .shape.animals { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
-        .shape.colors { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
-        .shape.vehicles { background: linear-gradient(135deg, #d299c2, #fef9d7); }
-        .shape.fruits { background: linear-gradient(135deg, #f093fb, #f5576c); }
-        .shape.weather { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-        .shape.objects { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-        .shape.food { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
-        .shape.emotions { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
-        .shape["articlesdefête"] { background: linear-gradient(135deg, #ff6b6b, #ffd93d); }
-
-        .shape-label {
-            font-size: clamp(10px, 3vw, 14px);
-            color: #4a5568;
-            font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            animation: fadeInUp 0.8s ease-out 0.2s both; /* Longer fade */
-            transition: color 0.3s ease;
-        }
-
-        .shape-container:hover .shape-label {
-            color: #667eea;
-            animation: pulseText 0.6s infinite; /* Longer pulse */
-        }
-
-        @keyframes pulseText {
-            0%, 100% { transform: scale(1); color: #667eea; }
-            50% { transform: scale(1.05); color: #5a67d8; }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        #main-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            padding: clamp(20px, 5vw, 40px);
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
-            backdrop-filter: blur(5px);
-            min-height: 0;
-            overflow: hidden;
-        }
-
-        #main-area::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle, rgba(74, 222, 128, 0.1) 0%, transparent 70%);
-            animation: successRipple 4s ease-in-out infinite; /* Slower ripple */
-            opacity: 0;
-        }
-
-        #target.correct + #main-area::before {
-            opacity: 1;
-        }
-
-        @keyframes successRipple {
-            0% { transform: scale(0.5) rotate(0deg); opacity: 0.3; }
-            50% { transform: scale(1.2) rotate(180deg); opacity: 0.6; }
-            100% { transform: scale(1.5) rotate(360deg); opacity: 0; }
-        }
-
-        #target {
-            width: clamp(100px, 20vw, 140px);
-            height: clamp(100px, 20vw, 140px);
-            border: 4px dashed #fff;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
-            border-radius: 25px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            font-size: clamp(30px, 10vw, 55px);
-            opacity: 0.7;
-            transition: all 0.3s ease;
-            animation: pulse 2.5s infinite; /* Slower pulse */
-            backdrop-filter: blur(5px);
-            flex-shrink: 0;
-        }
-
-        #target::after {
-            content: '🎯';
-            position: absolute;
-            font-size: 0.5em;
-            opacity: 0.5;
-            animation: rotate 4s linear infinite; /* Slower rotate */
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.05); opacity: 0.9; }
-        }
-
-        #target:hover {
-            border-color: #ffd700;
-            background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,215,0,0.1));
-            transform: scale(1.05) rotate(5deg); /* Added rotate */
-            animation: glow 1.2s infinite alternate; /* Longer glow */
-            box-shadow: var(--hover-glow);
-        }
-
-        @keyframes glow {
-            from { box-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700; }
-            to { box-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700, 0 0 40px #ffd700; }
-        }
-
-        #target.correct {
-            animation: celebrate 1s ease-out, fireworks 1.5s ease-out 0.5s, bounce 1s infinite; /* Longer animations */
-            border-color: var(--success-color);
-            background: linear-gradient(135deg, rgba(74,222,128,0.4), rgba(74,222,128,0.2));
-            transform: scale(1.2) rotate(360deg);
-        }
-
-        @keyframes celebrate {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            25% { transform: scale(1.1) rotate(5deg); }
-            50% { transform: scale(1.2) rotate(180deg); }
-            75% { transform: scale(1.1) rotate(-5deg); }
-        }
-
-        @keyframes fireworks {
-            0% {
-                box-shadow: 
-                    0 0 10px var(--success-color),
-                    0 0 20px var(--success-color),
-                    0 0 30px var(--success-color);
-            }
-            50% { 
-                box-shadow: 
-                    0 0 15px var(--success-color),
-                    0 0 30px var(--success-color),
-                    0 0 50px var(--success-color);
-            }
-            100% {
-                box-shadow: 
-                    0 0 20px var(--success-color),
-                    0 0 40px var(--success-color),
-                    0 0 60px var(--success-color);
-            }
+        @keyframes twinkle {
+            0% { opacity: 0.4; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.3); }
         }
 
         #level-display {
-            position: absolute;
-            top: clamp(10px, 3vw, 20px);
-            right: clamp(10px, 3vw, 20px);
-            font-size: clamp(16px, 4vw, 24px);
-            color: #2d3748;
-            background: var(--level-bg);
-            backdrop-filter: blur(10px);
-            padding: clamp(8px, 2vw, 12px) clamp(15px, 4vw, 20px);
-            border-radius: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            font-weight: 600;
-            animation: slideInRight 0.8s ease-out, levelSparkle 2s infinite; /* Added sparkle */
-            transition: all 0.3s ease;
-        }
-
-        @keyframes levelSparkle {
-            0%, 100% { text-shadow: 0 0 5px #ffd700; }
-            50% { text-shadow: 0 0 15px #ffd700, 0 0 25px #ffd700; }
-        }
-
-        #level-display:hover {
-            transform: scale(1.1) rotate(5deg); /* Added rotate */
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(30px) scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-
-        .progress-bar {
-            position: absolute;
-            bottom: clamp(10px, 3vw, 20px);
+            position: fixed;
+            top: clamp(10px, 2vh, 20px);
+            font-size: clamp(1.3em, 4.5vw, 1.6em);
+            font-weight: bold;
+            background: rgba(255,255,255,0.9);
+            padding: clamp(8px, 2.5vw, 12px) clamp(12px, 4.5vw, 24px);
+            border-radius: 25px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+            text-align: center;
             left: 50%;
             transform: translateX(-50%);
-            width: clamp(60%, 80vw, 80%);
-            height: clamp(6px, 2vw, 8px);
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
+            border: 2px solid rgba(255,215,0,0.5);
+        }
+
+        #progress-bar {
+            position: fixed;
+            top: clamp(65px, 9vh, 75px);
+            width: min(85%, 320px);
+            height: clamp(10px, 1.8vh, 12px);
+            background: rgba(255,255,255,0.6);
+            border-radius: 6px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            animation: progressBarSlide 0.8s ease-out; /* Longer slide */
+            z-index: 10;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
-        @keyframes progressBarSlide {
-            from { width: 0; opacity: 0; }
-            to { width: clamp(60%, 80vw, 80%); opacity: 1; }
-        }
-
-        .progress-fill {
+        #progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #4ade80, #10b981);
+            background: linear-gradient(90deg, #FF69B4, #FFD700, #87CEEB);
             width: 0%;
-            transition: width 0.8s ease; /* Slower fill */
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
-            animation: fillGlow 3s ease-in-out infinite alternate; /* Slower glow */
+            transition: width 0.6s ease;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
         }
 
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: progressShine 3s infinite; /* Slower shine */
+        #next-btn {
+            position: fixed;
+            top: clamp(10px, 2vh, 20px);
+            left: clamp(10px, 2vw, 20px);
+            font-size: clamp(1.2em, 4vw, 1.5em);
+            background: linear-gradient(45deg, #4CAF50, #8BC34A); /* Green for next */
+            border: none;
+            border-radius: 25px;
+            padding: clamp(8px, 2vh, 12px) clamp(12px, 4vw, 20px);
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-weight: bold;
+            min-width: clamp(80px, 18vw, 100px);
+        }
+        #next-btn:hover:not(:active), #next-btn:focus { 
+            transform: scale(1.05) translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        #next-btn:active { 
+            transform: scale(0.98); 
+        }
+        #next-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        @keyframes progressShine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        #star-btn {
+            position: fixed;
+            top: clamp(10px, 2vh, 20px);
+            right: clamp(10px, 2vw, 20px);
+            font-size: clamp(1.5em, 5vw, 2em);
+            background: radial-gradient(circle, #FFD700, #FFA500);
+            border: none;
+            border-radius: 50%;
+            width: clamp(40px, 8vw, 50px);
+            height: clamp(40px, 8vw, 50px);
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+        }
+        #star-btn:hover:not(:active), #star-btn:focus { 
+            transform: scale(1.2) rotate(10deg); 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3), 0 0 15px rgba(255,215,0,0.5);
+        }
+        #star-btn:active { 
+            transform: scale(1.1) rotate(5deg); 
         }
 
-        @keyframes fillGlow {
-            0% { box-shadow: inset 0 0 5px rgba(16, 185, 129, 0.5); }
-            100% { box-shadow: inset 0 0 15px rgba(74, 222, 128, 0.8), 0 0 20px rgba(74, 222, 128, 0.4); }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 5px;
-            }
-
-            #game-container {
-                flex-direction: column;
-                height: 95vh;
-                border-radius: 20px;
-            }
-
-            #items-area {
-                flex-direction: row;
-                justify-content: center;
-                align-items: center;
-                padding: clamp(15px, 5vw, 20px);
-                border-right: none;
-                border-bottom: 2px solid rgba(102, 126, 234, 0.2);
-                height: auto;
-                overflow-x: auto;
-                overflow-y: hidden;
-                gap: clamp(10px, 3vw, 15px);
-            }
-
-            #category-header {
-                position: absolute;
-                top: 10px;
-                left: 50%;
-                transform: translateX(-50%);
-                margin-bottom: 0;
-                z-index: 20;
-                width: auto;
-                max-width: 90%;
-            }
-
-            .shape-container {
-                margin-bottom: 0;
-                flex: 0 0 auto;
-                min-width: clamp(80px, 20vw, 100px);
-            }
-
-            #main-area {
-                height: auto;
-                padding: clamp(10px, 4vw, 20px);
-                justify-content: center;
-                flex: 1;
-            }
-
-            #target {
-                margin-top: clamp(20px, 5vw, 40px);
-            }
-
-            .progress-bar {
-                bottom: 5px;
-                width: 90%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #items-area {
-                padding: 10px;
-                gap: 8px;
-            }
-
-            .shape-container {
-                padding: 8px;
-            }
-
-            .shape {
-                width: 60px;
-                height: 60px;
-                font-size: 28px;
-            }
-
-            .shape-label {
-                font-size: 10px;
-            }
-
-            #target {
-                width: 90px;
-                height: 90px;
-                font-size: 32px;
-            }
-
-            #level-display {
-                top: 5px;
-                right: 5px;
-                padding: 6px 10px;
-                font-size: 14px;
-            }
-        }
-
-        .correct-feedback {
+        /* Yay flash on match */
+        #yay-flash {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: clamp(32px, 10vw, 48px);
-            color: var(--success-color);
-            z-index: 200;
-            animation: fireworks 1.5s ease-out forwards, bounceIn 0.8s ease-out, confettiRain 3s ease-out 0.5s; /* Longer effects */
+            font-size: clamp(3em, 10vw, 5em);
+            color: #FFD700;
+            font-weight: bold;
             pointer-events: none;
-            text-shadow: 0 0 10px var(--success-color);
+            z-index: 15;
+            opacity: 0;
+            animation: yayFlash 1s ease-out;
+        }
+        @keyframes yayFlash {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); text-shadow: 0 0 20px #FFD700; }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
         }
 
-        @keyframes fireworks {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(0) rotate(0deg);
-            }
-            50% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(1) rotate(720deg); /* More rotation */
+        #game-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(12px, 3.5vw, 22px);
+            width: min(92vw, 82vh);
+            height: min(72vh, 62vw);
+            max-width: clamp(220px, 82vw, 420px);
+            max-height: clamp(220px, 62vh, 420px);
+            z-index: 2;
+            position: relative;
+            justify-content: center;
+            align-content: center;
+        }
+
+        /* Landscape */
+        @media (orientation: landscape) and (min-width: 600px) {
+            #game-container {
+                width: min(72vw, 420px);
+                height: min(52vh, 320px);
+                gap: clamp(18px, 2.5vw, 28px);
             }
         }
 
-        @keyframes confettiRain {
-            0% { box-shadow: 0 0 0 var(--success-color); }
-            50% { box-shadow: 0 0 25px var(--success-color), 0 0 50px var(--success-color); }
-            100% { box-shadow: 0 0 50px var(--success-color), 0 0 100px var(--success-color); }
+        .card {
+            aspect-ratio: 1;
+            background: linear-gradient(145deg, #F0F0F0, #E0E0E0); /* Softer backs */
+            border-radius: clamp(12px, 3.5vw, 22px);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother flip */
+            transform-style: preserve-3d;
+            box-shadow: 0 clamp(5px, 1.2vw, 9px) clamp(10px, 2.5vw, 18px) rgba(0,0,0,0.15);
         }
 
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .card:hover:not(:active) {
+            box-shadow: 0 clamp(7px, 1.8vw, 14px) clamp(14px, 3.5vw, 26px) rgba(0,0,0,0.25);
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card.tapped {
+            animation: tapGlow 0.4s ease;
+        }
+
+        @keyframes tapGlow {
+            0% { box-shadow: 0 clamp(5px,1.2vw,9px) clamp(10px,2.5vw,18px) rgba(0,0,0,0.15), 0 0 25px rgba(255,105,180,0.6); }
+            100% { box-shadow: 0 clamp(5px,1.2vw,9px) clamp(10px,2.5vw,18px) rgba(0,0,0,0.15), 0 0 clamp(25px,6vw,45px) rgba(255,105,180,1); }
+        }
+
+        .card-front, .card-back {
+            position: absolute;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 150;
+            backface-visibility: hidden;
+            border-radius: inherit;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(2.2em, 13vw, 4.2em);
         }
 
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--success-color);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: explode 1.5s ease-out forwards; /* Longer explode */
-            box-shadow: 0 0 5px var(--success-color);
+        .card-back {
+            background: linear-gradient(145deg, #F0F0F0, #E0E0E0);
+            transform: rotateY(180deg);
         }
 
-        @keyframes explode {
-            0% {
-                opacity: 1;
-                transform: scale(0) rotate(0deg);
-            }
-            30% {
-                opacity: 1;
-                transform: scale(1) rotate(180deg);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(var(--dx), var(--dy)) scale(0) rotate(720deg); /* More rotation */
-            }
+        .card-front {
+            background: linear-gradient(145deg, #FFFFFF, #FAFAFA);
+            box-shadow: inset 0 0 clamp(12px,2.5vw,22px) rgba(0,0,0,0.08);
         }
 
-        .level-complete {
+        /* Enhanced match: Bounce + glow */
+        .matched {
+            animation: matchWiggle 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy */
+            opacity: 0;
+        }
+
+        @keyframes matchWiggle {
+            0% { transform: rotateY(180deg) scale(1) rotate(0deg); }
+            20% { transform: rotateY(180deg) scale(1.15) rotate(8deg); }
+            40% { transform: rotateY(180deg) scale(1.05) rotate(-8deg); }
+            60% { transform: rotateY(180deg) scale(1.1) rotate(4deg); }
+            80% { transform: rotateY(180deg) scale(1.02) rotate(-4deg); }
+            100% { transform: rotateY(180deg) scale(1) rotate(0deg); opacity: 0; }
+        }
+
+        /* Confetti */
+        .confetti {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: clamp(40px, 12vw, 60px);
-            color: var(--success-color);
-            z-index: 300;
-            animation: levelCompletePop 1.5s ease-out forwards; /* Longer pop */
+            width: clamp(6px, 1.8vw, 11px);
+            height: clamp(6px, 1.8vw, 11px);
+            background: hsl(var(--color), 80%, 65%);
             pointer-events: none;
-            text-shadow: 0 0 10px var(--success-color);
+            animation: confettiFall 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            top: 0;
+            z-index: 5;
+            border-radius: 50%;
+            box-shadow: 0 0 3px rgba(255,255,255,0.5);
         }
 
-        @keyframes levelCompletePop {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg) scale(0.6); opacity: 0; }
+        }
+
+        /* Shake effects */
+        body.wrong-shake { 
+            animation: wrongShake 0.4s ease-in-out; 
+        }
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px) rotate(-1.5deg); }
+            75% { transform: translateX(4px) rotate(1.5deg); }
+        }
+
+        body.shake { animation: shake 0.6s ease-in-out; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        /* Small screen tweaks */
+        @media (max-width: 480px) {
+            #game-container {
+                gap: 12px;
+                width: 92vw;
+                height: 52vh;
             }
-            50% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.5) rotate(180deg);
+            #level-display {
+                font-size: 1.3em;
+                padding: 6px 12px;
             }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1) rotate(1080deg); /* Triple spin */
+        }
+
+        /* Large screen */
+        @media (min-width: 768px) {
+            #game-container {
+                grid-template-columns: repeat(2, minmax(110px, 1fr));
+                gap: 28px;
+                width: 520px;
+                height: 520px;
+            }
+            body {
+                justify-content: flex-start;
+                padding-top: 60px;
             }
         }
     </style>
 </head>
 <body>
+    <div id="sparkles"></div>
+    <div id="level-display">Level 1 / 50</div>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+    <button id="next-btn" onclick="nextLevel()" disabled>Next →</button>
+    <button id="star-btn" onclick="toggleStars()">⭐<br>(0)</button>
+    <div id="yay-flash">Yay!</div>
     <div id="game-container">
-        <div id="items-area">
-            <h2 id="category-header"></h2>
-            <!-- Shapes added dynamically -->
-        </div>
-        <div id="main-area">
-            <div id="target"></div>
-            <div id="level-display">Level: 1</div>
-            <div class="progress-bar">
-                <div id="progress-fill" class="progress-fill"></div>
-            </div>
-        </div>
+        <!-- Cards will be generated by JS -->
     </div>
-    <div id="particles" class="particles"></div>
 
     <script>
-        const categories = [
-            {
-                name: 'Shapes',
-                items: [
-                    { id: 'star', emoji: '⭐', name: 'نجمة' },
-                    { id: 'square', emoji: '⬛', name: 'مربع' },
-                    { id: 'circle', emoji: '⚪', name: 'دائرة' },
-                    { id: 'triangle', emoji: '🔺', name: 'مثلث' }
-                ]
-            },
-            {
-                name: 'Animals',
-                items: [
-                    { id: 'dog', emoji: '🐶', name: 'كلب' },
-                    { id: 'cat', emoji: '🐱', name: 'قطة' },
-                    { id: 'bird', emoji: '🐦', name: 'طائر' },
-                    { id: 'fish', emoji: '🐟', name: 'سمكة' }
-                ]
-            },
-            {
-                name: 'Colors',
-                items: [
-                    { id: 'red', emoji: '🔴', name: 'أحمر' },
-                    { id: 'blue', emoji: '🔵', name: 'أزرق' },
-                    { id: 'green', emoji: '🟢', name: 'أخضر' },
-                    { id: 'yellow', emoji: '🟡', name: 'أصفر' }
-                ]
-            },
-            {
-                name: 'Vehicles',
-                items: [
-                    { id: 'car', emoji: '🚗', name: 'سيارة' },
-                    { id: 'truck', emoji: '🚚', name: 'شاحنة' },
-                    { id: 'bike', emoji: '🚲', name: 'دراجة' },
-                    { id: 'plane', emoji: '✈️', name: 'طائرة' }
-                ]
-            },
-            {
-                name: 'Fruits',
-                items: [
-                    { id: 'apple', emoji: '🍎', name: 'تفاحة' },
-                    { id: 'banana', emoji: '🍌', name: 'موزة' },
-                    { id: 'orange', emoji: '🍊', name: 'برتقالة' },
-                    { id: 'grape', emoji: '🍇', name: 'عنب' }
-                ]
-            },
-            {
-                name: 'Weather',
-                items: [
-                    { id: 'sun', emoji: '☀️', name: 'شمس' },
-                    { id: 'cloud', emoji: '☁️', name: 'غيمة' },
-                    { id: 'rain', emoji: '🌧️', name: 'مطر' },
-                    { id: 'snow', emoji: '❄️', name: 'ثلج' }
-                ]
-            },
-            {
-                name: 'Objects',
-                items: [
-                    { id: 'ball', emoji: '⚽', name: 'كرة' },
-                    { id: 'book', emoji: '📚', name: 'كتاب' },
-                    { id: 'clock', emoji: '⏰', name: 'ساعة' },
-                    { id: 'pen', emoji: '🖊️', name: 'قلم' }
-                ]
-            },
-            {
-                name: 'Food',
-                items: [
-                    { id: 'pizza', emoji: '🍕', name: 'بيتزا' },
-                    { id: 'burger', emoji: '🍔', name: 'برغر' },
-                    { id: 'icecream', emoji: '🍦', name: 'آيس كريم' },
-                    { id: 'cake', emoji: '🎂', name: 'كيك' }
-                ]
-            },
-            {
-                name: 'Emotions',
-                items: [
-                    { id: 'happy', emoji: '😊', name: 'سعيد' },
-                    { id: 'sad', emoji: '😢', name: 'حزين' },
-                    { id: 'angry', emoji: '😠', name: 'غاضب' },
-                    { id: 'surprised', emoji: '😲', name: 'مفاجأ' }
-                ]
-            },
-            {
-                name: 'Articles de Fête',
-                items: [
-                    { id: 'balloon', emoji: '🎈', name: 'بالون' },
-                    { id: 'confetti', emoji: '🎉', name: 'كونفيتي' },
-                    { id: 'gift', emoji: '🎁', name: 'هدية' },
-                    { id: 'firework', emoji: '🎆', name: 'ألعاب نارية' }
-                ]
-            }
-        ];
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let soundEnabled = true; // Always on now
+        let flippedCards = [];
+        let matchedPairs = 0;
+        const totalPairs = 2;
+        let currentLevel = parseInt(localStorage.getItem('matchyLevel')) || 1;
+        let totalStars = parseInt(localStorage.getItem('matchyStars')) || 0;
+        const maxLevels = 50;
+        let levelComplete = false; // Track if ready for next
 
-        let currentLevel = 1;
-        const maxLevels = 100; /* Increased to 100 for more levels */
-        let currentCategory;
-        let correctItem;
-        const synth = window.speechSynthesis;
+        const emojiToName = {
+            '🍎': 'apple', '🍌': 'banana', '🍊': 'orange', '🍇': 'grapes', '🍓': 'strawberry',
+            '🥝': 'kiwi', '🍉': 'watermelon', '🥭': 'mango', '🍍': 'pineapple', '🥥': 'coconut',
+            '🐶': 'dog', '🐱': 'cat', '🐭': 'mouse', '🐹': 'hamster', '🐰': 'rabbit',
+            '🦊': 'fox', '🐻': 'bear', '🐼': 'panda', '🐨': 'koala', '🐯': 'tiger',
+            '🚗': 'car', '🚙': 'suv', '🚌': 'bus', '🚚': 'truck', '🚜': 'tractor',
+            '✈️': 'airplane', '🚀': 'rocket', '🚲': 'bicycle', '🛸': 'ufo',
+            '🎈': 'balloon', '🎁': 'gift', '🎨': 'paint', '🎪': 'circus', '🎲': 'dice',
+            '🧸': 'teddy bear', '🧩': 'puzzle', '🏀': 'basketball', '⚽': 'soccer', '🎾': 'tennis',
+            '🌈': 'rainbow', '☀️': 'sun', '🌙': 'moon', '⭐': 'star', '🌟': 'sparkle',
+            '💫': 'dizzy', '🌸': 'flower', '🌺': 'flower', '🌻': 'sunflower', '🦋': 'butterfly'
+        };
 
-        let audioContext;
-        let reverbBuffer;
+        const emojiPool = Object.keys(emojiToName);
 
-        function initAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                loadReverbImpulse();
-            }
-        }
-
-        async function loadReverbImpulse() {
-            const length = audioContext.sampleRate * 2;
-            reverbBuffer = audioContext.createBuffer(2, length, audioContext.sampleRate);
-            for (let channel = 0; channel < 2; channel++) {
-                const data = reverbBuffer.getChannelData(channel);
-                for (let i = 0; i < length; i++) {
-                    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
-                }
-            }
-        }
-
-        function createReverbNode() {
-            const convolver = audioContext.createConvolver();
-            convolver.buffer = reverbBuffer;
-            return convolver;
-        }
-
-        function playTone(frequency, duration, type = 'sine', volume = 0.3, startTime = audioContext.currentTime) {
+        function playSound(frequency = 440, duration = 0.2, type = 'single') {
             if (!audioContext) return;
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.frequency.value = frequency;
-            oscillator.type = type;
-            gainNode.gain.setValueAtTime(volume, startTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-            oscillator.start(startTime);
-            oscillator.stop(startTime + duration);
-        }
-
-        function playSuccessSound(categoryIndex) {
-            initAudio();
-            // Enhanced celebratory melody: more upbeat "yes yes" like fanfare
-            const successTones = [
-                [523, 659, 784, 1047], // C E G C (higher octave for "wow!")
-                [659, 784, 988, 1047], // E G B C
-                [784, 988, 1175, 1319], // G B D E
-                [440, 554, 659, 880], // A C E A
-                [523, 659, 784, 1047], // Repeat for loop feel
-                [659, 784, 988, 1175], // E G B D
-                [784, 988, 1175, 1397], // G B D F
-                [349, 440, 523, 659], // F A C E
-                [523, 659, 784, 1047], // Final "yes!"
-                [659, 784, 988, 1319]  // Added for new category
-            ];
-            const tones = successTones[categoryIndex % successTones.length];
-            const startTime = audioContext.currentTime;
-
-            const reverb = createReverbNode();
-            reverb.connect(audioContext.destination);
-
-            tones.forEach((freq, i) => {
+            if (type === 'click') {
                 const osc = audioContext.createOscillator();
                 const gain = audioContext.createGain();
-                osc.frequency.value = freq;
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0, startTime + i * 0.12);
-                gain.gain.linearRampToValueAtTime(0.4, startTime + i * 0.12 + 0.01); // Slightly louder
-                gain.gain.exponentialRampToValueAtTime(0.01, startTime + i * 0.12 + 0.2);
-                osc.connect(gain).connect(reverb);
-                osc.start(startTime + i * 0.12);
-                osc.stop(startTime + i * 0.12 + 0.2);
-            });
-
-            // Add celebratory "yes yes" noise burst (like claps or cheers)
-            const bufferSize = audioContext.sampleRate * 0.15;
-            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.5); // Clap-like decay
-            }
-            const noise = audioContext.createBufferSource();
-            noise.buffer = buffer;
-            const filter = audioContext.createBiquadFilter();
-            filter.type = 'highpass';
-            filter.frequency.value = 1500;
-            const noiseGain = audioContext.createGain();
-            noiseGain.gain.setValueAtTime(0.15, startTime + 0.4);
-            noiseGain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.55);
-            noise.connect(filter).connect(noiseGain).connect(reverb);
-            noise.start(startTime + 0.4);
-
-            // Extra "yes" tone burst
-            setTimeout(() => {
-                playTone(784, 0.3, 'triangle', 0.5, audioContext.currentTime + 0.6); // G note for cheer
-                playTone(988, 0.3, 'triangle', 0.5, audioContext.currentTime + 0.65); // B note
-            }, 600);
-        }
-
-        function playFailureSound(categoryIndex) {
-            initAudio();
-            // Buzzer sound: Rapid oscillating square wave for a classic "buzz" effect
-            const startTime = audioContext.currentTime;
-            const buzzerFreq = 400; // Base frequency for buzz
-            const duration = 0.5; // Buzzer duration
-
-            for (let i = 0; i < 10; i++) { // Create buzz by alternating frequencies quickly
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                const freq = buzzerFreq + (Math.sin(i * 0.5) * 50); // Slight oscillation for buzz
-                osc.frequency.value = freq;
-                osc.type = 'square'; // Harsh square wave for buzzer tone
-                gain.gain.setValueAtTime(0.3, startTime + i * 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.01, startTime + i * 0.05 + 0.05);
                 osc.connect(gain);
                 gain.connect(audioContext.destination);
-                osc.start(startTime + i * 0.05);
-                osc.stop(startTime + i * 0.05 + 0.05);
-            }
-        }
-
-        function playDragSound(categoryIndex) {
-            initAudio();
-            const dragTones = [
-                800, 600, 400, 1200, 900, 700, 1000, 500, 300
-            ];
-            const freq = dragTones[categoryIndex % dragTones.length];
-            playTone(freq, 0.1, 'sawtooth', 0.1);
-        }
-
-        function createParticles(x, y) {
-            const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 20; i++) { /* Increased to 20 for more effect */
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = x + 'px';
-                particle.style.top = y + 'px';
-                particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`; /* Rainbow colors for kids */
-                const angle = (Math.PI * 2 * i) / 20;
-                const velocity = 50 + Math.random() * 150; /* Varied velocity */
-                particle.style.setProperty('--dx', (Math.cos(angle) * velocity) + 'px');
-                particle.style.setProperty('--dy', (Math.sin(angle) * velocity) + 'px');
-                particlesContainer.appendChild(particle);
-                setTimeout(() => particle.remove(), 1500); /* Longer life */
-            }
-        }
-
-        function showLevelComplete() {
-            const completeEl = document.createElement('div');
-            completeEl.className = 'level-complete';
-            completeEl.textContent = 'مستوى مكتمل! 🌟';
-            document.body.appendChild(completeEl);
-            setTimeout(() => completeEl.remove(), 2500); /* Longer display */
-        }
-
-        const itemsArea = document.getElementById('items-area');
-        const target = document.getElementById('target');
-        const levelDisplay = document.getElementById('level-display');
-        const categoryHeader = document.getElementById('category-header');
-        const progressFill = document.getElementById('progress-fill');
-
-        function initLevel() {
-            if (currentLevel > maxLevels) {
-                levelDisplay.textContent = 'Game Completed! 🎉';
-                // Clear shapes only (preserve header)
-                const existingContainers = itemsArea.querySelectorAll('.shape-container');
-                existingContainers.forEach(container => container.remove());
-                target.innerHTML = '';
-                categoryHeader.innerHTML = '';  // Optionally clear header text for completion screen
-                progressFill.style.width = '100%';
-                playSuccessSound(0);
-                createParticles(window.innerWidth / 2, window.innerHeight / 2);
-                showLevelComplete();
-                return;
-            }
-
-            currentCategory = categories[Math.floor(Math.random() * categories.length)];
-            
-            // Clear only shapes, keep header
-            const existingContainers = itemsArea.querySelectorAll('.shape-container');
-            existingContainers.forEach(container => container.remove());
-            
-            target.innerHTML = '';
-
-            categoryHeader.innerHTML = currentCategory.name;
-
-            currentCategory.items.forEach((item, index) => {
-                const shapeContainer = document.createElement('div');
-                shapeContainer.className = 'shape-container';
-
-                const shape = document.createElement('div');
-                // Normalize class name for CSS
-                const className = currentCategory.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                shape.className = `shape ${className}`;
-                shape.id = item.id;
-                shape.textContent = item.emoji;
-                shape.setAttribute('data-emoji', item.emoji);
-                shape.draggable = true;
-                shape.addEventListener('dragstart', (e) => {
-                    dragStart(e);
-                    playDragSound(categories.indexOf(currentCategory));
+                osc.frequency.setValueAtTime(800, audioContext.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.1);
+            } else if (type === 'match') {
+                [523.25, 659.25, 784].forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        osc.frequency.value = freq;
+                        osc.type = 'triangle';
+                        gain.gain.setValueAtTime(0.4, audioContext.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                        osc.start();
+                        osc.stop(audioContext.currentTime + 0.3);
+                    }, i * 150);
                 });
-                shape.addEventListener('touchstart', touchStart, { passive: false });
-
-                const label = document.createElement('div');
-                label.className = 'shape-label';
-                label.textContent = item.name;
-
-                shapeContainer.appendChild(shape);
-                shapeContainer.appendChild(label);
-                itemsArea.appendChild(shapeContainer);
-            });
-
-            correctItem = currentCategory.items[Math.floor(Math.random() * currentCategory.items.length)];
-
-            target.textContent = correctItem.emoji;
-
-            levelDisplay.textContent = `Level: ${currentLevel}`;
-            updateProgress();
-        }
-
-        function updateProgress() {
-            const progress = (currentLevel / maxLevels) * 100;
-            progressFill.style.width = `${progress}%`;
-        }
-
-        function dragStart(e) {
-            e.dataTransfer.setData('text/plain', e.target.id);
-        }
-
-        function touchStart(e) {
-            e.preventDefault();
-            playDragSound(categories.indexOf(currentCategory));
-            const touch = e.touches[0];
-            const elem = e.target;
-            elem.style.position = 'absolute';
-            elem.style.zIndex = 1000;
-
-            function touchMove(ev) {
-                ev.preventDefault();
-                const touch = ev.touches[0];
-                elem.style.left = `${touch.clientX - elem.offsetWidth / 2}px`;
-                elem.style.top = `${touch.clientY - elem.offsetHeight / 2}px`;
-            }
-
-            function touchEnd(ev) {
-                document.removeEventListener('touchmove', touchMove);
-                document.removeEventListener('touchend', touchEnd);
-                const dropX = ev.changedTouches[0].clientX;
-                const dropY = ev.changedTouches[0].clientY;
-                if (isOverTarget(dropX, dropY)) {
-                    checkDrop(elem.id);
-                } else {
-                    elem.style.position = '';
-                    elem.style.left = '';
-                    elem.style.top = '';
-                }
-            }
-
-            document.addEventListener('touchmove', touchMove, { passive: false });
-            document.addEventListener('touchend', touchEnd, { passive: false });
-        }
-
-        target.addEventListener('dragover', e => e.preventDefault());
-        target.addEventListener('drop', e => {
-            e.preventDefault();
-            const rect = target.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            createParticles(e.clientX, e.clientY);
-            const id = e.dataTransfer.getData('text/plain');
-            checkDrop(id);
-        });
-
-        function isOverTarget(x, y) {
-            const rect = target.getBoundingClientRect();
-            return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-        }
-
-        function checkDrop(id) {
-            const droppedItem = currentCategory.items.find(item => item.id === id);
-            const categoryIndex = categories.indexOf(currentCategory);
-            if (id === correctItem.id) {
-                // Eliminated speech on correct - just the correct sound now
-                playSuccessSound(categoryIndex);
-                target.classList.add('correct');
-                showFeedback('✅ صحيح! 🎉');
-                createParticles(target.getBoundingClientRect().left + target.offsetWidth / 2, target.getBoundingClientRect().top + target.offsetHeight / 2);
-                showLevelComplete();
-                setTimeout(() => {
-                    target.classList.remove('correct');
-                    currentLevel++;
-                    initLevel();
-                }, 1500);
+            } else if (type === 'wrong') {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.value = 392;
+                osc.type = 'square';
+                gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.2);
             } else {
-                // No speech on wrong - just buzzer
-                playFailureSound(categoryIndex);
-                showFeedback('❌ حاول مرة أخرى 😔');
-                setTimeout(() => {
-                    document.querySelector('.correct-feedback').remove();
-                }, 1000);
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
             }
-        }
-
-        function showFeedback(text) {
-            const existing = document.querySelector('.correct-feedback');
-            if (existing) existing.remove();
-            
-            const feedback = document.createElement('div');
-            feedback.className = 'correct-feedback';
-            feedback.textContent = text;
-            document.body.appendChild(feedback);
         }
 
         function speak(text) {
-            if (synth) {
-                synth.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ar-SA';
-                utterance.rate = 0.9;
-                utterance.pitch = 1.1;
-                utterance.volume = 1.0;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.8;
+            utterance.pitch = 1.2;
+            utterance.volume = 0.7;
+            speechSynthesis.speak(utterance);
+        }
 
-                const voices = synth.getVoices();
-                const arabicVoice = voices.find(voice => voice.lang.includes('ar'));
-                if (arabicVoice) {
-                    utterance.voice = arabicVoice;
+        function createSparkles() {
+            const sparklesDiv = document.getElementById('sparkles');
+            for (let i = 0; i < 25; i++) { // More sparkles
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + 'vw';
+                sparkle.style.top = Math.random() * 100 + 'vh';
+                sparkle.style.animationDelay = Math.random() * 1.5 + 's';
+                sparklesDiv.appendChild(sparkle);
+            }
+        }
+
+        function generateCards() {
+            const container = document.getElementById('game-container');
+            container.innerHTML = '';
+            let selectedEmojis = [];
+            while (selectedEmojis.length < 2) {
+                const randomEmoji = emojiPool[Math.floor(Math.random() * emojiPool.length)];
+                if (!selectedEmojis.includes(randomEmoji)) {
+                    selectedEmojis.push(randomEmoji);
                 }
+            }
+            const cardTypes = [selectedEmojis[0], selectedEmojis[1], selectedEmojis[0], selectedEmojis[1]];
+            cardTypes.sort(() => Math.random() - 0.5);
+            cardTypes.forEach((type) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.type = type;
+                card.dataset.name = emojiToName[type];
+                card.innerHTML = `
+                    <div class="card-back"></div>
+                    <div class="card-front">${type}</div>
+                `;
+                card.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+                    card.classList.add('tapped');
+                    setTimeout(() => card.classList.remove('tapped'), 400);
+                    playSound(null, null, 'click');
+                    flipCard(card);
+                });
+                container.appendChild(card);
+            });
+            levelComplete = false;
+            document.getElementById('next-btn').disabled = true;
+            updateProgressBar();
+            updateLevelDisplay();
+        }
 
-                utterance.onerror = (event) => {
-                    console.error('Speech synthesis error:', event.error);
-                };
+        function flipCard(card) {
+            card.classList.add('flipped');
+            const name = card.dataset.name;
+            speak(name);
+            flippedCards.push(card);
 
-                synth.speak(utterance);
+            if (flippedCards.length === 2) {
+                setTimeout(checkMatch, 500);
             }
         }
 
-        function initVoices() {
-            if (synth.getVoices().length > 0) {
-                initLevel();
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.dataset.type === card2.dataset.type) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                speak('Bravo!');
+                playSound(null, null, 'match');
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                createConfetti();
+                showYayFlash();
+                matchedPairs++;
+                if (matchedPairs === totalPairs) {
+                    levelComplete = true;
+                    document.getElementById('next-btn').disabled = false; // Enable button
+                    playSound(440, 0.5); // Level complete tone
+                }
             } else {
-                synth.onvoiceschanged = () => {
-                    initLevel();
-                };
+                speak('Wrong!');
+                playSound(null, null, 'wrong');
+                document.body.classList.add('wrong-shake');
+                setTimeout(() => document.body.classList.remove('wrong-shake'), 400);
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                }, 1000);
+            }
+            flippedCards = [];
+        }
+
+        function showYayFlash() {
+            const flash = document.getElementById('yay-flash');
+            flash.style.opacity = '1';
+            setTimeout(() => flash.style.opacity = '0', 1000);
+        }
+
+        function nextLevel() {
+            if (!levelComplete) return;
+            matchedPairs = 0;
+            currentLevel = Math.min(currentLevel + 1, maxLevels);
+            totalStars++;
+            localStorage.setItem('matchyLevel', currentLevel);
+            localStorage.setItem('matchyStars', totalStars);
+            if (currentLevel % 10 === 0) {
+                createConfetti();
+                if (navigator.vibrate) navigator.vibrate(500);
+            }
+            generateCards(); // Reshuffle
+            playSound(659.25, 0.6); // Advance sound
+            updateStarsDisplay();
+            if (currentLevel > maxLevels) {
+                currentLevel = 1;
+                localStorage.setItem('matchyLevel', 1);
             }
         }
 
-        const link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap';
-        link.rel = 'stylesheet';
-        document.head.appendChild(link);
+        function updateLevelDisplay() {
+            document.getElementById('level-display').textContent = `Level ${currentLevel} / ${maxLevels}`;
+        }
 
-        initVoices();
+        function updateProgressBar() {
+            const progress = (currentLevel / maxLevels) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function updateStarsDisplay() {
+            document.getElementById('star-btn').innerHTML = `⭐<br>(${totalStars})`;
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 18; i++) { // More festive
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.setProperty('--color', Math.random() * 360);
+                confetti.style.animationDelay = Math.random() * 0.6 + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 2200);
+            }
+        }
+
+        function toggleStars() {
+            speak(`You have ${totalStars} stars!`);
+            playSound(784, 0.4);
+            document.getElementById('star-btn').classList.add('tapped');
+            setTimeout(() => document.getElementById('star-btn').classList.remove('tapped'), 300);
+        }
+
+        if (window.DeviceMotionEvent) {
+            window.addEventListener('devicemotion', (e) => {
+                const accel = e.accelerationIncludingGravity;
+                if (accel && (Math.abs(accel.x) > 10 || Math.abs(accel.y) > 10)) {
+                    document.body.classList.add('shake');
+                    setTimeout(() => document.body.classList.remove('shake'), 600);
+                    resetCurrentLevel();
+                }
+            });
+        }
+
+        function resetCurrentLevel() {
+            matchedPairs = 0;
+            levelComplete = false;
+            flippedCards = [];
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('flipped', 'matched', 'tapped');
+            });
+            document.getElementById('next-btn').disabled = true;
+            playSound(null, null, 'wrong');
+        }
+
+        document.addEventListener('pointerdown', () => {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+            }
+        }, { once: true });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        }, false);
+
+        updateLevelDisplay();
+        updateProgressBar();
+        updateStarsDisplay();
+        generateCards();
+        createSparkles();
     </script>
 </body>
 </html>
