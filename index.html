@@ -223,7 +223,7 @@
             width: 80px;
             height: 80px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.1s ease, box-shadow 0.1s ease; /* Smooth dragging transitions */
             position: relative;
             margin-bottom: 5px;
             font-size: 3em;
@@ -233,7 +233,7 @@
             border-radius: 50%;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.5);
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
-            touch-action: none; /* Ensure touch events are captured */
+            touch-action: none;
         }
 
         .shape:hover {
@@ -266,10 +266,10 @@
         }
 
         .shape.dragging {
-            opacity: 0.6;
-            transform: scale(1.2); /* Slightly larger during drag */
+            opacity: 0.7;
+            transform: scale(1.2);
             box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-            z-index: 100;
+            z-index: 1000; /* Higher z-index for dragging */
         }
 
         .shape-label {
@@ -283,8 +283,8 @@
         }
 
         .drop-zone {
-            width: 90px;
-            height: 90px;
+            width: 100px; /* Slightly larger for easier dropping */
+            height: 100px;
             border: 3px dashed #999;
             display: flex;
             flex-direction: column;
@@ -494,7 +494,7 @@
     <script>
         function createStars() {
             const starsContainer = document.querySelector('.stars');
-            const starCount = window.innerWidth < 768 ? 8 : 15;
+            const starCount = window.innerWidth < 768 ? 6 : 12; // Reduced stars for performance
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
@@ -693,6 +693,8 @@
         ];
 
         let currentLevel = 1;
+        let lastTouchTime = 0;
+        let rafId = null; // For requestAnimationFrame
 
         function loadLevel() {
             const catIndex = (currentLevel - 1) % categories.length;
@@ -748,10 +750,12 @@
                 solid.removeEventListener('touchstart', touchStart);
                 solid.removeEventListener('touchmove', touchMove);
                 solid.removeEventListener('touchend', touchEnd);
+                solid.removeEventListener('touchcancel', touchCancel);
                 solid.addEventListener('dragstart', dragStart);
                 solid.addEventListener('touchstart', touchStart, { passive: false });
                 solid.addEventListener('touchmove', touchMove, { passive: false });
                 solid.addEventListener('touchend', touchEnd);
+                solid.addEventListener('touchcancel', touchCancel);
             });
 
             const dropZones = document.querySelectorAll('.drop-zone');
@@ -786,13 +790,17 @@
         function touchStart(e) {
             if (e.touches.length > 1) return; // Ignore multi-touch
             e.preventDefault();
+            const now = performance.now();
+            if (now - lastTouchTime < 50) return; // Debounce rapid touches
+            lastTouchTime = now;
+
             const touch = e.touches[0];
             const solid = e.target;
             solid.classList.add('dragging');
             const rect = solid.getBoundingClientRect();
             solid.dataset.offsetX = touch.clientX - rect.left;
             solid.dataset.offsetY = touch.clientY - rect.top;
-            solid.dataset.startScrollY = window.scrollY; // Account for scroll position
+            solid.dataset.startScrollY = window.scrollY;
         }
 
         function touchMove(e) {
@@ -800,17 +808,29 @@
             e.preventDefault();
             const touch = e.touches[0];
             const solid = e.target;
-            const offsetX = parseFloat(solid.dataset.offsetX) || 0;
-            const offsetY = parseFloat(solid.dataset.offsetY) || 0;
-            const startScrollY = parseFloat(solid.dataset.startScrollY) || 0;
-            solid.style.position = 'fixed';
-            solid.style.left = `${touch.clientX - offsetX}px`;
-            solid.style.top = `${touch.clientY - offsetY + startScrollY}px`;
-            solid.style.zIndex = '100';
+
+            // Cancel any existing animation frame
+            if (rafId) cancelAnimationFrame(rafId);
+
+            // Use requestAnimationFrame for smoother updates
+            rafId = requestAnimationFrame(() => {
+                const offsetX = parseFloat(solid.dataset.offsetX) || 0;
+                const offsetY = parseFloat(solid.dataset.offsetY) || 0;
+                const startScrollY = parseFloat(solid.dataset.startScrollY) || 0;
+                solid.style.position = 'fixed';
+                solid.style.left = `${touch.clientX - offsetX}px`;
+                solid.style.top = `${touch.clientY - offsetY + startScrollY}px`;
+                solid.style.zIndex = '1000';
+            });
         }
 
         function touchEnd(e) {
             const solid = e.target;
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+
             const touch = e.changedTouches[0];
             const dropZone = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.drop-zone');
             if (dropZone) {
@@ -829,6 +849,26 @@
                     speak('خطأ');
                     setTimeout(() => dropZone.classList.remove('error'), 300);
                 }
+            }
+
+            // Smoothly reset position
+            setTimeout(() => {
+                solid.classList.remove('dragging');
+                solid.style.position = '';
+                solid.style.left = '';
+                solid.style.top = '';
+                solid.style.zIndex = '';
+                delete solid.dataset.offsetX;
+                delete solid.dataset.offsetY;
+                delete solid.dataset.startScrollY;
+            }, 100); // Slight delay for smooth reset
+        }
+
+        function touchCancel(e) {
+            const solid = e.target;
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
             }
             solid.classList.remove('dragging');
             solid.style.position = '';
