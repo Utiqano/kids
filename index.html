@@ -8,7 +8,7 @@
     <style>
         * {
             box-sizing: border-box;
-            touch-action: none; /* Prevent default touch behaviors like scrolling */
+            touch-action: manipulation; /* Optimized for touch interactions */
         }
 
         body {
@@ -25,6 +25,7 @@
             min-height: 100vh;
             height: auto;
             color: #333;
+            overflow-x: hidden; /* Prevent horizontal scroll */
             overflow-y: auto;
         }
 
@@ -77,8 +78,8 @@
             align-items: center;
             position: relative;
             z-index: 1;
-            padding: 5px;
-            min-height: 100%;
+            padding: 5px 0;
+            min-height: 100vh;
         }
 
         h1 {
@@ -89,6 +90,7 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1), 0 0 20px rgba(255, 107, 107, 0.5);
             animation: bounce 2s infinite, glow 3s infinite alternate;
             flex-shrink: 0;
+            width: 100%;
         }
 
         @keyframes glow {
@@ -103,7 +105,7 @@
         }
 
         #reset-button {
-            margin: 10px;
+            margin: 10px auto;
             padding: 10px 20px;
             font-size: 1em;
             background: #ff6b6b;
@@ -113,6 +115,7 @@
             cursor: pointer;
             font-family: 'Fredoka One', cursive;
             flex-shrink: 0;
+            display: block;
         }
 
         #reset-button:hover {
@@ -125,10 +128,10 @@
             justify-content: space-between;
             width: 100%;
             align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 20px;
+            margin-bottom: 20px;
             flex: 1;
-            overflow: hidden;
+            min-height: 0;
         }
 
         .section {
@@ -136,12 +139,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow: visible;
+            overflow: hidden;
         }
 
         .right {
             width: 200px;
             max-width: 250px;
+            min-width: 150px;
         }
 
         .middle {
@@ -155,10 +159,11 @@
             border-radius: 25px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.15), inset 0 0 20px rgba(255, 255, 255, 0.3);
             max-height: none;
-            overflow-y: auto;
+            overflow: visible;
             direction: rtl;
             justify-content: center;
             align-items: center;
+            width: 100%;
         }
 
         .header {
@@ -174,6 +179,7 @@
             position: relative;
             overflow: hidden;
             flex-shrink: 0;
+            width: 100%;
         }
 
         .header::before {
@@ -202,6 +208,7 @@
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(254, 202, 87, 0.4);
             flex-shrink: 0;
+            width: 100%;
         }
 
         .shape-container {
@@ -209,7 +216,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin: 5px;
+            margin: 5px 0;
             animation: fadeIn 0.5s ease-in;
             min-height: 0;
         }
@@ -223,7 +230,7 @@
             width: 80px;
             height: 80px;
             cursor: pointer;
-            transition: transform 0.1s ease, box-shadow 0.1s ease; /* Smooth dragging transitions */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             position: relative;
             margin-bottom: 5px;
             font-size: 3em;
@@ -233,6 +240,7 @@
             border-radius: 50%;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.5);
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+            will-change: transform; /* Optimize for animations */
             touch-action: none;
         }
 
@@ -266,10 +274,12 @@
         }
 
         .shape.dragging {
-            opacity: 0.7;
-            transform: scale(1.2);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-            z-index: 1000; /* Higher z-index for dragging */
+            opacity: 0.8;
+            transform: scale(1.15);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: none; /* Disable transition during drag for smoothness */
+            will-change: transform, left, top;
         }
 
         .shape-label {
@@ -283,7 +293,7 @@
         }
 
         .drop-zone {
-            width: 100px; /* Slightly larger for easier dropping */
+            width: 100px;
             height: 100px;
             border: 3px dashed #999;
             display: flex;
@@ -341,47 +351,54 @@
             font-family: 'Fredoka One', cursive;
         }
 
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             body {
                 padding: 5px;
-                height: auto;
-                min-height: 100vh;
-                overflow-y: auto;
             }
 
             .game-wrapper {
-                min-height: 100vh;
                 padding: 5px;
+            }
+
+            h1 {
+                font-size: 2em;
+                margin: 8px 0;
+            }
+
+            #reset-button {
+                font-size: 1em;
+                padding: 8px 16px;
+                margin: 8px auto;
             }
 
             .game-container {
                 flex-direction: column;
+                gap: 15px;
                 align-items: center;
-                gap: 10px;
+                justify-content: center;
+                margin-bottom: 10px;
                 height: auto;
-                justify-content: flex-start;
-                padding: 5px;
+            }
+
+            .section {
+                width: 100%;
+                overflow: visible;
             }
 
             .right {
                 width: 100%;
                 max-width: none;
                 order: 2;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                overflow: visible;
+                min-width: auto;
             }
 
             .middle {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-                padding: 10px;
-                max-height: none;
-                overflow-y: visible;
-                direction: rtl;
-                justify-content: center;
+                gap: 12px;
+                padding: 15px;
                 width: 100%;
+                justify-items: center;
             }
 
             .shape {
@@ -395,82 +412,72 @@
                 height: 80px;
             }
 
-            h1 {
-                font-size: 1.8em;
-                margin: 5px 0;
-            }
-
             .header {
-                font-size: 1.2em;
-                padding: 8px 15px;
+                font-size: 1.3em;
+                padding: 8px 16px;
+                margin-bottom: 10px;
             }
 
             #level {
-                font-size: 1.2em;
+                font-size: 1.3em;
                 padding: 8px;
             }
 
             .shape-label {
-                font-size: 0.9em;
-                margin-top: 5px;
-            }
-
-            #reset-button {
-                font-size: 0.9em;
-                padding: 8px 15px;
+                font-size: 0.95em;
+                margin-top: 4px;
             }
         }
 
         @media (max-width: 480px) {
-            .shape {
-                width: 60px;
-                height: 60px;
-                font-size: 2em;
+            h1 {
+                font-size: 1.6em;
             }
 
-            .drop-zone {
-                width: 70px;
-                height: 70px;
+            #reset-button {
+                font-size: 0.9em;
+                padding: 6px 12px;
+            }
+
+            .game-container {
+                gap: 10px;
+                padding: 0 5px;
             }
 
             .middle {
                 grid-template-columns: 1fr;
-                gap: 8px;
-                padding: 8px;
-                max-height: none;
-                overflow-y: visible;
-                direction: rtl;
-                justify-content: center;
-                width: 100%;
+                gap: 10px;
+                padding: 10px;
             }
 
-            h1 {
-                font-size: 1.5em;
+            .shape {
+                width: 65px;
+                height: 65px;
+                font-size: 2.2em;
+            }
+
+            .drop-zone {
+                width: 75px;
+                height: 75px;
             }
 
             .header {
-                font-size: 1em;
+                font-size: 1.1em;
                 padding: 6px 12px;
             }
 
             #level {
-                font-size: 1em;
+                font-size: 1.1em;
                 padding: 6px;
             }
 
-            .game-container {
-                gap: 5px;
-                padding: 5px;
-            }
-
             .shape-label {
-                font-size: 0.8em;
-                margin-top: 4px;
+                font-size: 0.85em;
+                margin-top: 3px;
             }
 
-            #reset-button {
-                font-size: 0.8em;
-                padding: 6px 12px;
+            .shape-container {
+                margin: 3px 0;
             }
         }
     </style>
@@ -494,7 +501,7 @@
     <script>
         function createStars() {
             const starsContainer = document.querySelector('.stars');
-            const starCount = window.innerWidth < 768 ? 6 : 12; // Reduced stars for performance
+            const starCount = window.innerWidth < 768 ? 6 : 12;
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
@@ -694,7 +701,8 @@
 
         let currentLevel = 1;
         let lastTouchTime = 0;
-        let rafId = null; // For requestAnimationFrame
+        let rafId = null;
+        let isDragging = false;
 
         function loadLevel() {
             const catIndex = (currentLevel - 1) % categories.length;
@@ -754,7 +762,7 @@
                 solid.addEventListener('dragstart', dragStart);
                 solid.addEventListener('touchstart', touchStart, { passive: false });
                 solid.addEventListener('touchmove', touchMove, { passive: false });
-                solid.addEventListener('touchend', touchEnd);
+                solid.addEventListener('touchend', touchEnd, { passive: false });
                 solid.addEventListener('touchcancel', touchCancel);
             });
 
@@ -788,48 +796,65 @@
         }
 
         function touchStart(e) {
-            if (e.touches.length > 1) return; // Ignore multi-touch
+            if (e.touches.length > 1 || isDragging) return;
             e.preventDefault();
             const now = performance.now();
-            if (now - lastTouchTime < 50) return; // Debounce rapid touches
+            if (now - lastTouchTime < 100) return; // Increased debounce for better feel
             lastTouchTime = now;
 
             const touch = e.touches[0];
             const solid = e.target;
-            solid.classList.add('dragging');
             const rect = solid.getBoundingClientRect();
-            solid.dataset.offsetX = touch.clientX - rect.left;
-            solid.dataset.offsetY = touch.clientY - rect.top;
+            const shapeSize = rect.width / 2; // Center the drag point
+
+            solid.dataset.offsetX = touch.clientX - rect.left - shapeSize;
+            solid.dataset.offsetY = touch.clientY - rect.top - shapeSize;
+            solid.dataset.initialLeft = rect.left;
+            solid.dataset.initialTop = rect.top;
             solid.dataset.startScrollY = window.scrollY;
+
+            isDragging = true;
+            solid.classList.add('dragging');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling during drag
         }
 
         function touchMove(e) {
-            if (e.touches.length > 1) return; // Ignore multi-touch
+            if (!isDragging || e.touches.length > 1) return;
             e.preventDefault();
+            const now = performance.now();
+            if (now - lastTouchTime < 16) return; // Throttle to ~60fps
+            lastTouchTime = now;
+
             const touch = e.touches[0];
             const solid = e.target;
 
-            // Cancel any existing animation frame
             if (rafId) cancelAnimationFrame(rafId);
 
-            // Use requestAnimationFrame for smoother updates
             rafId = requestAnimationFrame(() => {
                 const offsetX = parseFloat(solid.dataset.offsetX) || 0;
                 const offsetY = parseFloat(solid.dataset.offsetY) || 0;
                 const startScrollY = parseFloat(solid.dataset.startScrollY) || 0;
+
+                // Use transform for smoother movement (GPU accelerated)
+                solid.style.transform = `translate3d(${touch.clientX - offsetX - solid.dataset.initialLeft}px, ${touch.clientY - offsetY - solid.dataset.initialTop + startScrollY}px, 0)`;
                 solid.style.position = 'fixed';
-                solid.style.left = `${touch.clientX - offsetX}px`;
-                solid.style.top = `${touch.clientY - offsetY + startScrollY}px`;
+                solid.style.left = `${solid.dataset.initialLeft}px`;
+                solid.style.top = `${solid.dataset.initialTop}px`;
                 solid.style.zIndex = '1000';
             });
         }
 
         function touchEnd(e) {
-            const solid = e.target;
+            if (!isDragging) return;
+            isDragging = false;
+
             if (rafId) {
                 cancelAnimationFrame(rafId);
                 rafId = null;
             }
+
+            const solid = e.target;
+            document.body.style.overflow = ''; // Restore scrolling
 
             const touch = e.changedTouches[0];
             const dropZone = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.drop-zone');
@@ -840,10 +865,12 @@
                     const ghost = dropZone.querySelector('.shape');
                     ghost.remove();
                     dropZone.appendChild(solid);
+                    solid.style.transform = ''; // Reset transform
                     solid.classList.add('matched');
                     dropZone.classList.add('matched');
                     speak(zoneShape);
                     checkLevelCompletion();
+                    return;
                 } else {
                     dropZone.classList.add('error');
                     speak('خطأ');
@@ -851,8 +878,11 @@
                 }
             }
 
-            // Smoothly reset position
+            // Smooth reset with transition
+            solid.style.transition = 'transform 0.2s ease';
+            solid.style.transform = '';
             setTimeout(() => {
+                solid.style.transition = '';
                 solid.classList.remove('dragging');
                 solid.style.position = '';
                 solid.style.left = '';
@@ -860,16 +890,22 @@
                 solid.style.zIndex = '';
                 delete solid.dataset.offsetX;
                 delete solid.dataset.offsetY;
+                delete solid.dataset.initialLeft;
+                delete solid.dataset.initialTop;
                 delete solid.dataset.startScrollY;
-            }, 100); // Slight delay for smooth reset
+            }, 200);
         }
 
         function touchCancel(e) {
-            const solid = e.target;
+            if (!isDragging) return;
+            isDragging = false;
             if (rafId) {
                 cancelAnimationFrame(rafId);
                 rafId = null;
             }
+            document.body.style.overflow = '';
+            const solid = e.target;
+            solid.style.transform = '';
             solid.classList.remove('dragging');
             solid.style.position = '';
             solid.style.left = '';
@@ -877,6 +913,8 @@
             solid.style.zIndex = '';
             delete solid.dataset.offsetX;
             delete solid.dataset.offsetY;
+            delete solid.dataset.initialLeft;
+            delete solid.dataset.initialTop;
             delete solid.dataset.startScrollY;
         }
 
@@ -913,6 +951,11 @@
             currentLevel = 1;
             loadLevel();
             speak('تم إعادة اللعبة');
+        });
+
+        // Handle orientation change or resize
+        window.addEventListener('resize', () => {
+            createStars(); // Recreate stars on resize
         });
 
         loadLevel();
