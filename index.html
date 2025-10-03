@@ -1,57 +1,118 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة السحب والإفلات للأطفال</title>
+    <title>Kids Drag and Drop Adventure!</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@400;600&display=swap');
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Comic Neue', cursive;
         }
 
         body {
+            font-family: 'Poppins', sans-serif;
             display: flex;
             min-height: 100vh;
-            background: linear-gradient(135deg, #ffeb3b, #ff5722);
+            background: linear-gradient(-45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            background-size: 400% 400%;
+            animation: rainbowShift 15s ease infinite;
             overflow: hidden;
             touch-action: manipulation;
+            position: relative;
+        }
+
+        /* Animated background elements for fun */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255,255,255,0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.2) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes rainbowShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        #title {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(24px, 6vw, 36px);
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            z-index: 50;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
         }
 
         #sidebar {
-            width: min(25%, 250px);
+            width: 25%;
+            max-width: 250px;
             background: rgba(255, 255, 255, 0.95);
-            box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 2px 0 20px rgba(0,0,0,0.2);
             padding: 20px;
             overflow-y: auto;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-right: 3px solid rgba(255,255,255,0.5);
         }
 
         #sidebar.collapsed {
-            transform: translateX(100%);
+            transform: translateX(-100%);
+            box-shadow: none;
+        }
+
+        #sidebar:hover:not(.collapsed) {
+            box-shadow: 2px 0 30px rgba(0,0,0,0.3);
         }
 
         #toggle-btn {
             position: fixed;
             top: 15px;
-            right: 15px;
+            left: 15px;
             z-index: 100;
-            background: #ff4081;
-            color: white;
-            border: none;
+            background: rgba(255,255,255,0.9);
+            color: #ff6b6b;
+            border: 2px solid #ff6b6b;
             border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         #toggle-btn:hover {
-            background: #f50057;
+            background: #ff6b6b;
+            color: white;
             transform: scale(1.1);
         }
 
@@ -64,68 +125,214 @@
             padding: 20px;
         }
 
+        .category-header {
+            font-family: 'Fredoka One', cursive;
+            font-size: 16px;
+            font-weight: 400;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 2px dashed #4ecdc4;
+            text-align: center;
+            animation: wiggle 2s infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            75% { transform: rotate(-2deg); }
+        }
+
         .shape {
-            width: 90px;
-            height: 90px;
+            width: 80px;
+            height: 80px;
             margin: 15px auto;
             cursor: grab;
             touch-action: none;
-            border-radius: 15px;
+            border-radius: 50% 20% 50% 20%; /* Fun wavy shape */
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy ease */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
+            font-size: 40px;
             text-align: center;
             user-select: none;
-            background: linear-gradient(45deg, #64b5f6, #81c784);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.5);
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        .shape:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        .shape:nth-child(1) { animation-delay: 0.1s; }
+        .shape:nth-child(2) { animation-delay: 0.2s; }
+        .shape:nth-child(3) { animation-delay: 0.3s; }
+        .shape:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
+        .shape::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.4), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .shape:hover::before,
+        .shape:active::before {
+            opacity: 1;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .shape:active,
         .shape.dragging {
-            animation: bounce 0.5s infinite alternate;
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+        }
+
+        .shape.success {
+            background: linear-gradient(45deg, #4caf50, #8bc34a);
+            animation: successBounce 0.6s ease-in-out, sparkle 0.5s ease-in-out;
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.6);
+        }
+
+        @keyframes successBounce {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(360deg); }
+            100% { transform: scale(1) rotate(720deg); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         #target {
-            width: 130px;
-            height: 130px;
-            border: 4px dashed #2196f3;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
+            width: 140px;
+            height: 140px;
+            border: 4px dashed #fff;
+            background: rgba(255, 255, 255, 0.15); /* Slightly more transparent bg */
+            border-radius: 50%;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            font-size: 60px;
-            opacity: 0.25;
-            transition: transform 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2), inset 0 2px 10px rgba(255,255,255,0.5);
+            font-size: 72px; /* Much grander: bigger emoji! */
+            opacity: 0.5; /* More transparent for a ghostly, magical feel */
+            transition: all 0.4s ease;
+            animation: targetGlow 2s ease-in-out infinite alternate;
+            overflow: hidden;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8); /* Cool glow around emoji */
         }
 
-        .correct-animation {
-            animation: zoomCelebrate 0.6s ease-in-out;
-            border-color: #4caf50;
-            background: rgba(76, 175, 80, 0.3);
+        #target::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            opacity: 0.6;
+            animation: emojiShine 3s linear infinite;
+            pointer-events: none;
         }
 
-        .shake-animation {
-            animation: shake 0.4s ease-in-out;
+        @keyframes emojiShine {
+            0% { transform: translate(-100%, -100%) rotate(0deg); }
+            100% { transform: translate(100%, 100%) rotate(360deg); }
         }
 
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
+        @keyframes targetGlow {
+            from { box-shadow: 0 10px 30px rgba(0,0,0,0.2), inset 0 2px 10px rgba(255,255,255,0.5); }
+            to { box-shadow: 0 10px 40px rgba(255,255,255,0.3), inset 0 2px 15px rgba(255,255,255,0.7); }
         }
 
-        @keyframes zoomCelebrate {
-            0% { transform: scale(1); box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); }
-            50% { transform: scale(1.3); box-shadow: 0 0 20px rgba(76, 175, 80, 1); }
-            100% { transform: scale(1); box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); }
+        #target::after {
+            content: '🎯';
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.4; /* Slightly more transparent bullseye */
+            animation: pulse 1.5s infinite;
+        }
+
+        #target.success {
+            border: 4px solid #4caf50;
+            background: rgba(76, 175, 80, 0.25); /* More transparent success bg */
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; /* Fun shape */
+            animation: successPulse 0.8s ease-in-out;
+            transform: scale(1.1);
+            opacity: 0.7; /* Less transparent on success for emphasis */
+            font-size: 80px; /* Even grander on win! */
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1.1); }
+        }
+
+        #level-display {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            font-family: 'Fredoka One', cursive;
+            font-size: clamp(20px, 5vw, 28px);
+            color: #fff;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            animation: levelFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes levelFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        #restart-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Fredoka One', cursive;
+            font-size: 18px;
+            display: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        #restart-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+        }
+
+        /* Shake for wrong drops */
+        .shake {
+            animation: shake 0.5s ease-in-out;
         }
 
         @keyframes shake {
@@ -134,150 +341,112 @@
             75% { transform: translateX(10px); }
         }
 
-        #particle-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        #level-display {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: clamp(20px, 5vw, 24px);
-            color: #fff;
-            background: rgba(255, 87, 34, 0.8);
-            padding: 10px 20px;
-            border-radius: 25px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
-
-        #voice-message {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: clamp(16px, 4vw, 18px);
-            color: #fff;
-            background: rgba(244, 67, 54, 0.8);
-            padding: 8px 16px;
-            border-radius: 20px;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        #voice-message.show {
-            opacity: 1;
-        }
-
         @media (max-width: 600px) {
             #sidebar {
-                width: 40%;
-                max-width: 200px;
+                width: 50%;
+                max-width: none;
             }
 
             .shape {
                 width: 70px;
                 height: 70px;
-                font-size: 40px;
+                font-size: 35px;
             }
 
             #target {
-                width: 110px;
-                height: 110px;
-                font-size: 50px;
+                width: 120px;
+                height: 120px;
+                font-size: 60px; /* Scaled down but still grand on mobile */
             }
 
             #toggle-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
             }
 
-            #level-display, #voice-message {
-                font-size: clamp(16px, 4vw, 18px);
-                padding: 8px 16px;
+            #title {
+                top: 5px;
+                font-size: clamp(20px, 8vw, 28px);
             }
         }
     </style>
 </head>
 <body>
+    <h1 id="title">Drag & Drop Adventure! 🌈</h1>
     <button id="toggle-btn">☰</button>
-    <div id="sidebar">
+    <div id="sidebar" class="collapsed">
         <!-- Shapes added dynamically -->
     </div>
     <div id="main-area">
-        <canvas id="particle-canvas"></canvas>
-        <div id="target"></div>
-        <div id="level-display">المستوى: 1</div>
-        <div id="voice-message"></div>
+        <div id="target">🎯</div>
+        <div id="level-display">Level: 1</div>
+        <button id="restart-btn">Play Again! 🚀</button>
     </div>
 
     <script>
         const categories = [
             {
-                name: 'Shapes',
+                name: 'Shapes ✨',
                 items: [
-                    { id: 'star', emoji: '⭐', name: 'نجمة' },
-                    { id: 'square', emoji: '⬛', name: 'مربع' },
-                    { id: 'circle', emoji: '⚪', name: 'دائرة' },
-                    { id: 'triangle', emoji: '🔺', name: 'مثلث' }
+                    { id: 'star', emoji: '⭐', name: 'نجمة', gradient: 'linear-gradient(45deg, #ffd700, #ffed4e)' },
+                    { id: 'square', emoji: '⬛', name: 'مربع', gradient: 'linear-gradient(45deg, #4a4a4a, #6b6b6b)' },
+                    { id: 'circle', emoji: '⚪', name: 'دائرة', gradient: 'linear-gradient(45deg, #fff, #e0e0e0)' },
+                    { id: 'triangle', emoji: '🔺', name: 'مثلث', gradient: 'linear-gradient(45deg, #ff4757, #ff6b7a)' }
                 ]
             },
             {
-                name: 'Animals',
+                name: 'Animals 🐾',
                 items: [
-                    { id: 'dog', emoji: '🐶', name: 'كلب' },
-                    { id: 'cat', emoji: '🐱', name: 'قطة' },
-                    { id: 'bird', emoji: '🐦', name: 'طائر' },
-                    { id: 'fish', emoji: '🐟', name: 'سمكة' }
+                    { id: 'dog', emoji: '🐶', name: 'كلب', gradient: 'linear-gradient(45deg, #f39c12, #e67e22)' },
+                    { id: 'cat', emoji: '🐱', name: 'قطة', gradient: 'linear-gradient(45deg, #9b59b6, #8e44ad)' },
+                    { id: 'bird', emoji: '🐦', name: 'طائر', gradient: 'linear-gradient(45deg, #3498db, #2980b9)' },
+                    { id: 'fish', emoji: '🐟', name: 'سمكة', gradient: 'linear-gradient(45deg, #1abc9c, #16a085)' }
                 ]
             },
             {
-                name: 'Colors',
+                name: 'Colors 🎨',
                 items: [
-                    { id: 'red', emoji: '🔴', name: 'أحمر' },
-                    { id: 'blue', emoji: '🔵', name: 'أزرق' },
-                    { id: 'green', emoji: '🟢', name: 'أخضر' },
-                    { id: 'yellow', emoji: '🟡', name: 'أصفر' }
+                    { id: 'red', emoji: '🔴', name: 'أحمر', gradient: 'linear-gradient(45deg, #e74c3c, #c0392b)' },
+                    { id: 'blue', emoji: '🔵', name: 'أزرق', gradient: 'linear-gradient(45deg, #3498db, #2980b9)' },
+                    { id: 'green', emoji: '🟢', name: 'أخضر', gradient: 'linear-gradient(45deg, #2ecc71, #27ae60)' },
+                    { id: 'yellow', emoji: '🟡', name: 'أصفر', gradient: 'linear-gradient(45deg, #f1c40f, #f39c12)' }
                 ]
             },
             {
-                name: 'Vehicles',
+                name: 'Vehicles 🚀',
                 items: [
-                    { id: 'car', emoji: '🚗', name: 'سيارة' },
-                    { id: 'truck', emoji: '🚚', name: 'شاحنة' },
-                    { id: 'bike', emoji: '🚲', name: 'دراجة' },
-                    { id: 'plane', emoji: '✈️', name: 'طائرة' }
+                    { id: 'car', emoji: '🚗', name: 'سيارة', gradient: 'linear-gradient(45deg, #e74c3c, #c0392b)' },
+                    { id: 'truck', emoji: '🚚', name: 'شاحنة', gradient: 'linear-gradient(45deg, #34495e, #2c3e50)' },
+                    { id: 'bike', emoji: '🚲', name: 'دراجة', gradient: 'linear-gradient(45deg, #9b59b6, #8e44ad)' },
+                    { id: 'plane', emoji: '✈️', name: 'طائرة', gradient: 'linear-gradient(45deg, #3498db, #2980b9)' }
                 ]
             },
             {
-                name: 'Fruits',
+                name: 'Fruits 🍎',
                 items: [
-                    { id: 'apple', emoji: '🍎', name: 'تفاحة' },
-                    { id: 'banana', emoji: '🍌', name: 'موزة' },
-                    { id: 'orange', emoji: '🍊', name: 'برتقالة' },
-                    { id: 'grape', emoji: '🍇', name: 'عنب' }
+                    { id: 'apple', emoji: '🍎', name: 'تفاحة', gradient: 'linear-gradient(45deg, #e74c3c, #c0392b)' },
+                    { id: 'banana', emoji: '🍌', name: 'موزة', gradient: 'linear-gradient(45deg, #f1c40f, #f39c12)' },
+                    { id: 'orange', emoji: '🍊', name: 'برتقالة', gradient: 'linear-gradient(45deg, #e67e22, #d35400)' },
+                    { id: 'grape', emoji: '🍇', name: 'عنب', gradient: 'linear-gradient(45deg, #9b59b6, #8e44ad)' }
                 ]
             },
             {
-                name: 'Weather',
+                name: 'Weather ☀️',
                 items: [
-                    { id: 'sun', emoji: '☀️', name: 'شمس' },
-                    { id: 'cloud', emoji: '☁️', name: 'غيمة' },
-                    { id: 'rain', emoji: '🌧️', name: 'مطر' },
-                    { id: 'snow', emoji: '❄️', name: 'ثلج' }
+                    { id: 'sun', emoji: '☀️', name: 'شمس', gradient: 'linear-gradient(45deg, #f39c12, #e67e22)' },
+                    { id: 'cloud', emoji: '☁️', name: 'غيمة', gradient: 'linear-gradient(45deg, #bdc3c7, #95a5a6)' },
+                    { id: 'rain', emoji: '🌧️', name: 'مطر', gradient: 'linear-gradient(45deg, #3498db, #2980b9)' },
+                    { id: 'snow', emoji: '❄️', name: 'ثلج', gradient: 'linear-gradient(45deg, #ecf0f1, #bdc3c7)' }
                 ]
             },
             {
-                name: 'Objects',
+                name: 'Objects 📚',
                 items: [
-                    { id: 'ball', emoji: '⚽', name: 'كرة' },
-                    { id: 'book', emoji: '📚', name: 'كتاب' },
-                    { id: 'clock', emoji: '⏰', name: 'ساعة' },
-                    { id: 'pen', emoji: '🖊️', name: 'قلم' }
+                    { id: 'ball', emoji: '⚽', name: 'كرة', gradient: 'linear-gradient(45deg, #e74c3c, #c0392b)' },
+                    { id: 'book', emoji: '📚', name: 'كتاب', gradient: 'linear-gradient(45deg, #9b59b6, #8e44ad)' },
+                    { id: 'clock', emoji: '⏰', name: 'ساعة', gradient: 'linear-gradient(45deg, #f39c12, #e67e22)' },
+                    { id: 'pen', emoji: '🖊️', name: 'قلم', gradient: 'linear-gradient(45deg, #2ecc71, #27ae60)' }
                 ]
             }
         ];
@@ -287,121 +456,97 @@
         let currentCategory;
         let correctItem;
         const synth = window.speechSynthesis;
-        let arabicVoice = null;
+        let draggedElement = null;
 
         const sidebar = document.getElementById('sidebar');
         const toggleBtn = document.getElementById('toggle-btn');
         const target = document.getElementById('target');
         const levelDisplay = document.getElementById('level-display');
-        const voiceMessage = document.getElementById('voice-message');
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
+        const restartBtn = document.getElementById('restart-btn');
 
-        // Particle effect with confetti
-        let particles = [];
-        function createParticles(x, y) {
-            for (let i = 0; i < 30; i++) {
-                particles.push({
-                    x: x,
-                    y: y,
-                    vx: (Math.random() - 0.5) * 10,
-                    vy: (Math.random() - 0.5) * 10,
-                    radius: Math.random() * 6 + 3,
-                    color: `hsl(${Math.random() * 360}, 80%, 60%)`,
-                    life: 30,
-                    shape: Math.random() > 0.5 ? 'circle' : 'square'
-                });
-            }
+        // Auto-collapse sidebar on mobile
+        if (window.innerWidth <= 600) {
+            sidebar.classList.add('collapsed');
         }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles = particles.filter(p => p.life > 0);
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.1;
-                p.life--;
-                p.radius *= 0.98;
-                ctx.beginPath();
-                if (p.shape === 'circle') {
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                } else {
-                    ctx.rect(p.x - p.radius, p.y - p.radius, p.radius * 2, p.radius * 2);
-                }
-                ctx.fillStyle = p.color;
-                ctx.fill();
-            });
-            if (particles.length > 0) {
-                requestAnimationFrame(animateParticles);
-            }
-        }
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
 
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
             toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '☰' : '✖';
         });
 
+        restartBtn.addEventListener('click', () => {
+            currentLevel = 1;
+            initLevel();
+            restartBtn.style.display = 'none';
+        });
+
         function initLevel() {
             if (currentLevel > maxLevels) {
-                levelDisplay.textContent = 'اكتملت اللعبة!';
+                levelDisplay.textContent = 'You Won! 🎉🥳';
                 sidebar.innerHTML = '';
-                target.innerHTML = '';
+                target.innerHTML = '🏆';
+                target.classList.add('success');
+                restartBtn.style.display = 'block';
+                speak('مبروك! أنت بطل اللعبة! 🎊');
                 return;
             }
 
             currentCategory = categories[Math.floor(Math.random() * categories.length)];
-            sidebar.innerHTML = '';
+            sidebar.innerHTML = `<div class="category-header">${currentCategory.name}</div>`;
             target.innerHTML = '';
+            target.classList.remove('success');
 
-            currentCategory.items.forEach(item => {
+            currentCategory.items.forEach((item, index) => {
                 const shape = document.createElement('div');
                 shape.className = 'shape';
                 shape.id = item.id;
-                shape.textContent = item.emoji;
+                shape.dataset.originalPos = shape.style.transform || '';
+                shape.style.background = item.gradient;
+                shape.innerHTML = item.emoji;
                 shape.draggable = true;
                 shape.addEventListener('dragstart', dragStart);
-                shape.addEventListener('dragend', dragEnd);
                 shape.addEventListener('touchstart', touchStart, { passive: false });
                 sidebar.appendChild(shape);
+                // Re-attach dragend
+                addDragEnd(shape);
             });
 
             correctItem = currentCategory.items[Math.floor(Math.random() * currentCategory.items.length)];
+            target.innerHTML = correctItem.emoji;
 
-            target.textContent = correctItem.emoji;
-
-            levelDisplay.textContent = `المستوى: ${currentLevel}`;
+            levelDisplay.textContent = `Level: ${currentLevel} 🌟`;
         }
 
         function dragStart(e) {
+            draggedElement = e.target;
             e.target.classList.add('dragging');
             e.dataTransfer.setData('text/plain', e.target.id);
+            e.dataTransfer.effectAllowed = 'move';
         }
 
         function dragEnd(e) {
             e.target.classList.remove('dragging');
+            if (e.dataTransfer.dropEffect !== 'move') {
+                resetShape(e.target);
+            }
         }
 
         function touchStart(e) {
             e.preventDefault();
-            const touch = e.touches[0];
-            const elem = e.target;
+            draggedElement = e.target;
+            const elem = draggedElement;
             elem.classList.add('dragging');
             elem.style.position = 'absolute';
             elem.style.zIndex = 1000;
+            const rect = elem.getBoundingClientRect();
+            elem.dataset.offsetX = e.touches[0].clientX - rect.left;
+            elem.dataset.offsetY = e.touches[0].clientY - rect.top;
 
             function touchMove(ev) {
                 ev.preventDefault();
                 const touch = ev.touches[0];
-                elem.style.left = `${touch.clientX - elem.offsetWidth / 2}px`;
-                elem.style.top = `${touch.clientY - elem.offsetHeight / 2}px`;
+                elem.style.left = `${touch.clientX - parseFloat(elem.dataset.offsetX)}px`;
+                elem.style.top = `${touch.clientY - parseFloat(elem.dataset.offsetY)}px`;
             }
 
             function touchEnd(ev) {
@@ -411,11 +556,9 @@
                 const dropX = ev.changedTouches[0].clientX;
                 const dropY = ev.changedTouches[0].clientY;
                 if (isOverTarget(dropX, dropY)) {
-                    checkDrop(elem.id);
+                    checkDrop(elem.id, elem);
                 } else {
-                    elem.style.position = '';
-                    elem.style.left = '';
-                    elem.style.top = '';
+                    resetShape(elem);
                 }
             }
 
@@ -427,153 +570,92 @@
         target.addEventListener('drop', e => {
             e.preventDefault();
             const id = e.dataTransfer.getData('text/plain');
-            checkDrop(id);
+            checkDrop(id, draggedElement);
+            draggedElement = null;
         });
+
+        function addDragEnd(shape) {
+            shape.addEventListener('dragend', dragEnd);
+        }
 
         function isOverTarget(x, y) {
             const rect = target.getBoundingClientRect();
             return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
         }
 
-        function checkDrop(id) {
+        function resetShape(elem) {
+            elem.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            elem.style.transform = elem.dataset.originalPos || '';
+            elem.style.position = '';
+            elem.style.left = '';
+            elem.style.top = '';
+            elem.classList.add('shake');
+            setTimeout(() => {
+                elem.classList.remove('shake');
+                elem.style.transition = '';
+            }, 500);
+        }
+
+        function checkDrop(id, elem = null) {
             const droppedItem = currentCategory.items.find(item => item.id === id);
+            if (!droppedItem) return;
+
             speak(droppedItem.name);
+
             if (id === correctItem.id) {
-                target.classList.add('correct-animation');
-                const rect = target.getBoundingClientRect();
-                createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
-                animateParticles();
+                if (elem) elem.classList.add('success');
+                target.classList.add('success');
+                speak('صحيح! ياي! 🌟');
+
+                currentLevel++;
                 setTimeout(() => {
-                    target.classList.remove('correct-animation');
-                    currentLevel++;
+                    if (elem) resetShape(elem);
                     initLevel();
-                }, 1000);
+                }, 2000);
             } else {
-                target.classList.add('shake-animation');
-                setTimeout(() => {
-                    target.classList.remove('shake-animation');
-                }, 400);
+                if (elem) {
+                    speak('جرب مرة أخرى! 😊');
+                    resetShape(elem);
+                }
             }
         }
 
         function speak(text) {
-            if (!synth) {
-                showVoiceMessage('الصوت غير مدعوم في المتصفح 😢');
-                return;
-            }
-
-            synth.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ar-SA';
-            utterance.rate = 1.0;
-            utterance.pitch = 1.2;
-            utterance.volume = 1.0;
-
-            if (arabicVoice) {
-                utterance.voice = arabicVoice;
-            } else {
-                showVoiceMessage('الصوت العربي غير متوفر 😢');
-                return;
-            }
-
-            utterance.onerror = (event) => {
-                showVoiceMessage('حدث خطأ في الصوت 😢');
-            };
-
-            utterance.onend = () => {
+            if (synth && !synth.speaking) {
                 synth.cancel();
-            };
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ar-SA';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.3;
+                utterance.volume = 1.0;
 
-            try {
-                synth.speak(utterance);
-            } catch (error) {
-                showVoiceMessage('خطأ في تشغيل الصوت 😢');
-            }
-        }
-
-        function showVoiceMessage(message) {
-            voiceMessage.textContent = message;
-            voiceMessage.classList.add('show');
-            setTimeout(() => {
-                voiceMessage.classList.remove('show');
-            }, 4000);
-        }
-
-        function loadArabicVoice() {
-            return new Promise((resolve) => {
                 const voices = synth.getVoices();
-                arabicVoice = voices.find(voice => voice.lang.includes('ar'));
+                const arabicVoice = voices.find(voice => voice.lang.includes('ar'));
                 if (arabicVoice) {
-                    resolve(true);
-                    return;
+                    utterance.voice = arabicVoice;
                 }
 
-                let retryCount = 0;
-                const maxRetries = 5;
-                const retryInterval = setInterval(() => {
-                    const voices = synth.getVoices();
-                    arabicVoice = voices.find(voice => voice.lang.includes('ar'));
-                    if (arabicVoice || retryCount >= maxRetries) {
-                        clearInterval(retryInterval);
-                        resolve(!!arabicVoice);
-                    }
-                    retryCount++;
-                }, 1000);
+                utterance.onerror = (event) => {
+                    console.error('Speech synthesis error:', event.error);
+                };
 
-                setTimeout(() => {
-                    clearInterval(retryInterval);
-                    if (!arabicVoice) {
-                        resolve(false);
-                    }
-                }, 7000);
-            });
+                synth.speak(utterance);
+            }
         }
 
-        async function initVoices() {
-            if (!synth) {
-                showVoiceMessage('الصوت غير مدعوم في المتصفح 😢');
-                initLevel();
-                return;
-            }
-
+        // Load voices and initialize
+        function initVoices() {
             const voices = synth.getVoices();
             if (voices.length > 0) {
-                const success = await loadArabicVoice();
-                if (success) {
-                    initLevel();
-                } else {
-                    showVoiceMessage('الصوت العربي غير متوفر، استمر بدون صوت 😊');
-                    initLevel();
-                }
+                initLevel();
             } else {
-                synth.onvoiceschanged = async () => {
-                    synth.onvoiceschanged = null; // Prevent multiple triggers
-                    const success = await loadArabicVoice();
-                    if (success) {
-                        initLevel();
-                    } else {
-                        showVoiceMessage('الصوت العربي غير متوفر، استمر بدون صوت 😊');
-                        initLevel();
-                    }
+                synth.onvoiceschanged = () => {
+                    initVoices();
                 };
-                setTimeout(() => {
-                    if (!arabicVoice && synth.getVoices().length === 0) {
-                        showVoiceMessage('الصوت العربي غير متوفر، استمر بدون صوت 😊');
-                        initLevel();
-                    }
-                }, 8000);
             }
         }
 
-        // Load Comic Neue font
-        const link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap';
-        link.rel = 'stylesheet';
-        document.head.appendChild(link);
-
-        // Adjust for RTL layout
-        document.documentElement.setAttribute('dir', 'rtl');
-
+        // Initialize
         initVoices();
     </script>
 </body>
