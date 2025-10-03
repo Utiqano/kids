@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kids Drag and Drop Game</title>
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #4ade80;
+            --error-color: #ef4444;
+            --hover-glow: 0 0 20px rgba(255, 215, 0, 0.5);
+            --shape-glow: 0 0 15px rgba(0, 0, 0, 0.3);
+            --level-bg: linear-gradient(135deg, #ffd700, #ffed4a); /* Changed to golden for level display */
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,7 +23,7 @@
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             overflow: hidden;
             touch-action: manipulation;
             position: relative;
@@ -22,6 +31,12 @@
             justify-content: center;
             align-items: center;
             padding: 10px;
+            animation: backgroundShift 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundShift {
+            0% { background: var(--primary-gradient); }
+            100% { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
         }
 
         body::before {
@@ -34,6 +49,12 @@
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23stars)"/></svg>');
             pointer-events: none;
             z-index: 1;
+            animation: starTwinkle 3s linear infinite;
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         #game-container {
@@ -48,6 +69,12 @@
             overflow: hidden;
             position: relative;
             z-index: 10;
+            animation: containerFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes containerFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
         #items-area {
@@ -61,6 +88,25 @@
             border-right: 2px solid rgba(102, 126, 234, 0.2);
             overflow-y: auto;
             min-height: 0;
+            position: relative;
+        }
+
+        #items-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            animation: bgPulse 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         #category-header {
@@ -82,6 +128,12 @@
             justify-content: center;
             gap: clamp(5px, 2vw, 10px);
             flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        #category-header:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
         }
 
         #category-header::before {
@@ -103,13 +155,13 @@
 
         @keyframes bounce {
             0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
             40% {
-                transform: translateY(-10px);
+                transform: translateY(-10px) scale(1.1);
             }
             60% {
-                transform: translateY(-5px);
+                transform: translateY(-5px) scale(1.05);
             }
         }
 
@@ -120,11 +172,26 @@
             background: rgba(255, 255, 255, 0.7);
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             border: 1px solid rgba(102, 126, 234, 0.2);
             flex-shrink: 0;
             position: relative;
             overflow: hidden;
+            animation: containerSlideIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        .shape-container:nth-child(1) { animation-delay: 0.1s; }
+        .shape-container:nth-child(2) { animation-delay: 0.2s; }
+        .shape-container:nth-child(3) { animation-delay: 0.3s; }
+        .shape-container:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes containerSlideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .shape-container::before {
@@ -151,9 +218,9 @@
         }
 
         .shape-container:hover {
-            transform: translateY(-3px) rotate(2deg);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            background: rgba(255, 255, 255, 0.85);
+            transform: translateY(-3px) rotate(2deg) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2), var(--hover-glow);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .shape {
@@ -170,10 +237,21 @@
             font-size: clamp(30px, 8vw, 45px);
             text-align: center;
             user-select: none;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            box-shadow: var(--shape-glow);
             position: relative;
             overflow: hidden;
             border: 2px solid rgba(255,255,255,0.3);
+            animation: shapePulse 2s ease-in-out infinite alternate;
+        }
+
+        .shape:nth-child(1) { animation-delay: 0.1s; }
+        .shape:nth-child(2) { animation-delay: 0.3s; }
+        .shape:nth-child(3) { animation-delay: 0.5s; }
+        .shape:nth-child(4) { animation-delay: 0.7s; }
+
+        @keyframes shapePulse {
+            0% { box-shadow: var(--shape-glow); }
+            100% { box-shadow: 0 0 25px rgba(0,0,0,0.4); }
         }
 
         .shape::after {
@@ -197,14 +275,9 @@
         }
 
         @keyframes sparkle {
-            0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
+            0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
         }
-
-        .shape:nth-child(1) { animation-delay: 0.1s; }
-        .shape:nth-child(2) { animation-delay: 0.2s; }
-        .shape:nth-child(3) { animation-delay: 0.3s; }
-        .shape:nth-child(4) { animation-delay: 0.4s; }
 
         @keyframes bounceIn {
             0% {
@@ -225,7 +298,7 @@
 
         .shape:hover {
             transform: translateY(-5px) scale(1.05) rotate(5deg);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.25), var(--hover-glow);
             animation: wiggle 0.5s ease-in-out;
         }
 
@@ -237,6 +310,13 @@
 
         .shape:active {
             transform: scale(0.95);
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
         .shape.shapes { background: linear-gradient(135deg, #a8edea, #fed6e3); }
@@ -248,6 +328,7 @@
         .shape.objects { background: linear-gradient(135deg, #43e97b, #38f9d7); }
         .shape.food { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
         .shape.emotions { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
+        .shape["articlesdefête"] { background: linear-gradient(135deg, #ff6b6b, #ffd93d); } /* New gradient for party category */
 
         .shape-label {
             font-size: clamp(10px, 3vw, 14px);
@@ -264,8 +345,8 @@
         }
 
         @keyframes pulseText {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            0%, 100% { transform: scale(1); color: #667eea; }
+            50% { transform: scale(1.05); color: #5a67d8; }
         }
 
         @keyframes fadeInUp {
@@ -290,6 +371,29 @@
             background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
             backdrop-filter: blur(5px);
             min-height: 0;
+            overflow: hidden;
+        }
+
+        #main-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, rgba(74, 222, 128, 0.1) 0%, transparent 70%);
+            animation: successRipple 3s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        #target.correct + #main-area::before {
+            opacity: 1;
+        }
+
+        @keyframes successRipple {
+            0% { transform: scale(0.5); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+            100% { transform: scale(1.5); opacity: 0; }
         }
 
         #target {
@@ -334,16 +438,17 @@
             background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,215,0,0.1));
             transform: scale(1.05);
             animation: glow 1s infinite alternate;
+            box-shadow: var(--hover-glow);
         }
 
         @keyframes glow {
             from { box-shadow: 0 0 5px #ffd700; }
-            to { box-shadow: 0 0 20px #ffd700; }
+            to { box-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700; }
         }
 
         #target.correct {
-            animation: celebrate 0.6s ease-out, fireworks 1s ease-out 0.5s;
-            border-color: #4ade80;
+            animation: celebrate 0.6s ease-out, fireworks 1s ease-out 0.5s, bounce 0.8s infinite;
+            border-color: var(--success-color);
             background: linear-gradient(135deg, rgba(74,222,128,0.4), rgba(74,222,128,0.2));
             transform: scale(1.2);
         }
@@ -357,15 +462,15 @@
         @keyframes fireworks {
             0% {
                 box-shadow: 
-                    0 0 10px #4ade80,
-                    0 0 20px #4ade80,
-                    0 0 30px #4ade80;
+                    0 0 10px var(--success-color),
+                    0 0 20px var(--success-color),
+                    0 0 30px var(--success-color);
             }
             100% {
                 box-shadow: 
-                    0 0 20px #4ade80,
-                    0 0 40px #4ade80,
-                    0 0 60px #4ade80;
+                    0 0 20px var(--success-color),
+                    0 0 40px var(--success-color),
+                    0 0 60px var(--success-color);
             }
         }
 
@@ -374,8 +479,8 @@
             top: clamp(10px, 3vw, 20px);
             right: clamp(10px, 3vw, 20px);
             font-size: clamp(16px, 4vw, 24px);
-            color: #fff;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            color: #2d3748; /* Changed text color for better contrast on new bg */
+            background: var(--level-bg); /* Updated to golden gradient */
             backdrop-filter: blur(10px);
             padding: clamp(8px, 2vw, 12px) clamp(15px, 4vw, 20px);
             border-radius: 30px;
@@ -383,6 +488,12 @@
             border: 1px solid rgba(255,255,255,0.3);
             font-weight: 600;
             animation: slideInRight 0.6s ease-out;
+            transition: all 0.3s ease;
+        }
+
+        #level-display:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
         @keyframes slideInRight {
@@ -407,6 +518,12 @@
             border-radius: 4px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            animation: progressBarSlide 0.5s ease-out;
+        }
+
+        @keyframes progressBarSlide {
+            from { width: 0; }
+            to { width: clamp(60%, 80vw, 80%); }
         }
 
         .progress-fill {
@@ -417,6 +534,7 @@
             border-radius: 4px;
             position: relative;
             overflow: hidden;
+            animation: fillGlow 2s ease-in-out infinite alternate;
         }
 
         .progress-fill::after {
@@ -433,6 +551,11 @@
         @keyframes progressShine {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
+        }
+
+        @keyframes fillGlow {
+            0% { box-shadow: inset 0 0 5px rgba(16, 185, 129, 0.5); }
+            100% { box-shadow: inset 0 0 15px rgba(74, 222, 128, 0.8); }
         }
 
         @media (max-width: 768px) {
@@ -533,25 +656,31 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: clamp(32px, 10vw, 48px);
-            color: #4ade80;
+            color: var(--success-color);
             z-index: 200;
-            animation: fireworks 1s ease-out forwards, bounceIn 0.6s ease-out;
+            animation: fireworks 1s ease-out forwards, bounceIn 0.6s ease-out, confettiRain 2s ease-out 0.5s;
             pointer-events: none;
+            text-shadow: 0 0 10px var(--success-color);
         }
 
         @keyframes fireworks {
             0% {
                 opacity: 1;
-                transform: translate(-50%, -50%) scale(0);
+                transform: translate(-50%, -50%) scale(0) rotate(0deg);
             }
             50% {
                 opacity: 1;
-                transform: translate(-50%, -50%) scale(1.2);
+                transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
             }
             100% {
                 opacity: 0;
-                transform: translate(-50%, -50%) scale(1);
+                transform: translate(-50%, -50%) scale(1) rotate(360deg);
             }
+        }
+
+        @keyframes confettiRain {
+            0% { box-shadow: 0 0 0 var(--success-color); }
+            100% { box-shadow: 0 0 50px var(--success-color), 0 0 100px var(--success-color); }
         }
 
         .particles {
@@ -568,10 +697,11 @@
             position: absolute;
             width: 4px;
             height: 4px;
-            background: #4ade80;
+            background: var(--success-color);
             border-radius: 50%;
             pointer-events: none;
             animation: explode 1s ease-out forwards;
+            box-shadow: 0 0 5px var(--success-color);
         }
 
         @keyframes explode {
@@ -585,7 +715,34 @@
             }
             100% {
                 opacity: 0;
-                transform: translate(var(--dx), var(--dy)) scale(0);
+                transform: translate(var(--dx), var(--dy)) scale(0) rotate(360deg);
+            }
+        }
+
+        .level-complete {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(40px, 12vw, 60px);
+            color: var(--success-color);
+            z-index: 300;
+            animation: levelCompletePop 1s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes levelCompletePop {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.5) rotate(0deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) rotate(360deg);
             }
         }
     </style>
@@ -688,6 +845,15 @@
                     { id: 'angry', emoji: '😠', name: 'غاضب' },
                     { id: 'surprised', emoji: '😲', name: 'مفاجأ' }
                 ]
+            },
+            {
+                name: 'Articles de Fête',
+                items: [
+                    { id: 'balloon', emoji: '🎈', name: 'بالون' },
+                    { id: 'confetti', emoji: '🎉', name: 'كونفيتي' },
+                    { id: 'gift', emoji: '🎁', name: 'هدية' },
+                    { id: 'firework', emoji: '🎆', name: 'ألعاب نارية' }
+                ]
             }
         ];
 
@@ -698,14 +864,33 @@
         const synth = window.speechSynthesis;
 
         let audioContext;
+        let reverbBuffer;
 
         function initAudio() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                loadReverbImpulse();
             }
         }
 
-        function playTone(frequency, duration, type = 'sine', volume = 0.3) {
+        async function loadReverbImpulse() {
+            const length = audioContext.sampleRate * 2;
+            reverbBuffer = audioContext.createBuffer(2, length, audioContext.sampleRate);
+            for (let channel = 0; channel < 2; channel++) {
+                const data = reverbBuffer.getChannelData(channel);
+                for (let i = 0; i < length; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+                }
+            }
+        }
+
+        function createReverbNode() {
+            const convolver = audioContext.createConvolver();
+            convolver.buffer = reverbBuffer;
+            return convolver;
+        }
+
+        function playTone(frequency, duration, type = 'sine', volume = 0.3, startTime = audioContext.currentTime) {
             if (!audioContext) return;
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
@@ -713,49 +898,91 @@
             gainNode.connect(audioContext.destination);
             oscillator.frequency.value = frequency;
             oscillator.type = type;
-            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + duration);
+            gainNode.gain.setValueAtTime(volume, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration);
         }
 
         function playSuccessSound(categoryIndex) {
             initAudio();
+            // Enhanced celebratory melody: more upbeat "yes yes" like fanfare
             const successTones = [
-                // Vary by category
-                [523, 659, 784], // C major chord for shapes
-                [440, 554, 659], // A minor for animals
-                [392, 494, 587], // G major for colors
-                [349, 440, 523], // F major for vehicles
-                [294, 370, 440], // D minor for fruits
-                [262, 330, 392], // C minor for weather
-                [220, 277, 330], // A minor low for objects
-                [196, 247, 294], // G minor for food
-                [174, 220, 261]  // F minor for emotions
+                [523, 659, 784, 1047], // C E G C (higher octave for "wow!")
+                [659, 784, 988, 1047], // E G B C
+                [784, 988, 1175, 1319], // G B D E
+                [440, 554, 659, 880], // A C E A
+                [523, 659, 784, 1047], // Repeat for loop feel
+                [659, 784, 988, 1175], // E G B D
+                [784, 988, 1175, 1397], // G B D F
+                [349, 440, 523, 659], // F A C E
+                [523, 659, 784, 1047], // Final "yes!"
+                [659, 784, 988, 1319]  // Added for new category
             ];
             const tones = successTones[categoryIndex % successTones.length];
+            const startTime = audioContext.currentTime;
+
+            const reverb = createReverbNode();
+            reverb.connect(audioContext.destination);
+
             tones.forEach((freq, i) => {
-                setTimeout(() => playTone(freq, 0.15, 'sine', 0.3), i * 150);
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.frequency.value = freq;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0, startTime + i * 0.12);
+                gain.gain.linearRampToValueAtTime(0.4, startTime + i * 0.12 + 0.01); // Slightly louder
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime + i * 0.12 + 0.2);
+                osc.connect(gain).connect(reverb);
+                osc.start(startTime + i * 0.12);
+                osc.stop(startTime + i * 0.12 + 0.2);
             });
+
+            // Add celebratory "yes yes" noise burst (like claps or cheers)
+            const bufferSize = audioContext.sampleRate * 0.15;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.5); // Clap-like decay
+            }
+            const noise = audioContext.createBufferSource();
+            noise.buffer = buffer;
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = 1500;
+            const noiseGain = audioContext.createGain();
+            noiseGain.gain.setValueAtTime(0.15, startTime + 0.4);
+            noiseGain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.55);
+            noise.connect(filter).connect(noiseGain).connect(reverb);
+            noise.start(startTime + 0.4);
+
+            // Extra "yes" tone burst
+            setTimeout(() => {
+                playTone(784, 0.3, 'triangle', 0.5, audioContext.currentTime + 0.6); // G note for cheer
+                playTone(988, 0.3, 'triangle', 0.5, audioContext.currentTime + 0.65); // B note
+            }, 600);
         }
 
         function playFailureSound(categoryIndex) {
             initAudio();
-            const failureTones = [
-                [200, 150, 100], // Descending for shapes
-                [300, 250, 200], // For animals
-                [400, 300, 200], // For colors
-                [250, 200, 150], // For vehicles
-                [350, 250, 150], // For fruits
-                [450, 350, 250], // For weather
-                [150, 100, 50],  // Low for objects
-                [500, 400, 300], // High for food
-                [100, 50, 25]    // Very low for emotions
-            ];
-            const tones = failureTones[categoryIndex % failureTones.length];
-            tones.forEach((freq, i) => {
-                setTimeout(() => playTone(freq, 0.2, 'square', 0.2), i * 100);
-            });
+            // Buzzer sound: Rapid oscillating square wave for a classic "buzz" effect
+            const startTime = audioContext.currentTime;
+            const buzzerFreq = 400; // Base frequency for buzz
+            const duration = 0.5; // Buzzer duration
+
+            for (let i = 0; i < 10; i++) { // Create buzz by alternating frequencies quickly
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                const freq = buzzerFreq + (Math.sin(i * 0.5) * 50); // Slight oscillation for buzz
+                osc.frequency.value = freq;
+                osc.type = 'square'; // Harsh square wave for buzzer tone
+                gain.gain.setValueAtTime(0.3, startTime + i * 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime + i * 0.05 + 0.05);
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.start(startTime + i * 0.05);
+                osc.stop(startTime + i * 0.05 + 0.05);
+            }
         }
 
         function playDragSound(categoryIndex) {
@@ -784,6 +1011,14 @@
             }
         }
 
+        function showLevelComplete() {
+            const completeEl = document.createElement('div');
+            completeEl.className = 'level-complete';
+            completeEl.textContent = 'مستوى مكتمل! 🌟';
+            document.body.appendChild(completeEl);
+            setTimeout(() => completeEl.remove(), 2000);
+        }
+
         const itemsArea = document.getElementById('items-area');
         const target = document.getElementById('target');
         const levelDisplay = document.getElementById('level-display');
@@ -793,17 +1028,24 @@
         function initLevel() {
             if (currentLevel > maxLevels) {
                 levelDisplay.textContent = 'Game Completed! 🎉';
-                itemsArea.innerHTML = '<h2 id="category-header"></h2>';
+                // Clear shapes only (preserve header)
+                const existingContainers = itemsArea.querySelectorAll('.shape-container');
+                existingContainers.forEach(container => container.remove());
                 target.innerHTML = '';
-                categoryHeader.innerHTML = '';
+                categoryHeader.innerHTML = '';  // Optionally clear header text for completion screen
                 progressFill.style.width = '100%';
                 playSuccessSound(0);
                 createParticles(window.innerWidth / 2, window.innerHeight / 2);
+                showLevelComplete();
                 return;
             }
 
             currentCategory = categories[Math.floor(Math.random() * categories.length)];
-            itemsArea.innerHTML = '';
+            
+            // Clear only shapes, keep header
+            const existingContainers = itemsArea.querySelectorAll('.shape-container');
+            existingContainers.forEach(container => container.remove());
+            
             target.innerHTML = '';
 
             categoryHeader.innerHTML = currentCategory.name;
@@ -813,7 +1055,9 @@
                 shapeContainer.className = 'shape-container';
 
                 const shape = document.createElement('div');
-                shape.className = `shape ${currentCategory.name.toLowerCase()}`;
+                // Normalize class name for CSS
+                const className = currentCategory.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                shape.className = `shape ${className}`;
                 shape.id = item.id;
                 shape.textContent = item.emoji;
                 shape.setAttribute('data-emoji', item.emoji);
@@ -901,19 +1145,21 @@
 
         function checkDrop(id) {
             const droppedItem = currentCategory.items.find(item => item.id === id);
-            speak(droppedItem.name);
             const categoryIndex = categories.indexOf(currentCategory);
             if (id === correctItem.id) {
+                // Eliminated speech on correct - just the correct sound now
                 playSuccessSound(categoryIndex);
                 target.classList.add('correct');
                 showFeedback('✅ صحيح! 🎉');
                 createParticles(target.getBoundingClientRect().left + target.offsetWidth / 2, target.getBoundingClientRect().top + target.offsetHeight / 2);
+                showLevelComplete();
                 setTimeout(() => {
                     target.classList.remove('correct');
                     currentLevel++;
                     initLevel();
                 }, 1500);
             } else {
+                // No speech on wrong - just buzzer
                 playFailureSound(categoryIndex);
                 showFeedback('❌ حاول مرة أخرى 😔');
                 setTimeout(() => {
@@ -923,7 +1169,6 @@
         }
 
         function showFeedback(text) {
-            // Remove existing feedback if any
             const existing = document.querySelector('.correct-feedback');
             if (existing) existing.remove();
             
