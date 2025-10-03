@@ -34,16 +34,17 @@
         }
 
         #sidebar {
-            width: 25%;
-            max-width: 280px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 4px 0 20px rgba(0,0,0,0.15);
-            padding: 30px 20px;
+            width: 28%;
+            max-width: 320px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+            backdrop-filter: blur(15px);
+            box-shadow: 6px 0 30px rgba(0,0,0,0.2);
+            padding: 40px 25px;
             overflow-y: auto;
             transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             z-index: 10;
             position: relative;
+            border-radius: 0 25px 25px 0;
         }
 
         #sidebar::before {
@@ -53,8 +54,27 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.95) 100%);
+            background: radial-gradient(circle at top left, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
             z-index: -1;
+            border-radius: 0 25px 25px 0;
+        }
+
+        #sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #5a67d8, #6b46c1);
         }
 
         #sidebar.collapsed {
@@ -63,18 +83,66 @@
 
         #category-header {
             text-align: center;
-            margin-bottom: 25px;
-            color: #4a5568;
-            font-size: 24px;
-            font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 35px;
+            color: #2d3748;
+            font-size: 26px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
             animation: fadeInDown 0.6s ease-out;
+            position: relative;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            border-radius: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+        }
+
+        #category-header::after {
+            content: '🎯';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 20px;
+            animation: bounce 2s infinite;
         }
 
         @keyframes fadeInDown {
             from {
                 opacity: 0;
                 transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .shape-label {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #4a5568;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
@@ -120,7 +188,7 @@
         .shape {
             width: 90px;
             height: 90px;
-            margin: 20px auto;
+            margin: 25px auto;
             cursor: grab;
             touch-action: none;
             border-radius: 20px;
@@ -135,6 +203,7 @@
             position: relative;
             overflow: hidden;
             animation: bounceIn 0.6s ease-out;
+            border: 2px solid rgba(255,255,255,0.3);
         }
 
         .shape:nth-child(1) { animation-delay: 0.1s; }
@@ -161,7 +230,7 @@
 
         .shape:hover {
             transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
         }
 
         .shape:active {
@@ -267,20 +336,25 @@
 
         @media (max-width: 600px) {
             #sidebar {
-                width: 45%;
-                max-width: 250px;
-                padding: 20px 15px;
+                width: 50%;
+                max-width: 280px;
+                padding: 30px 20px;
             }
 
             #category-header {
-                font-size: 20px;
+                font-size: 22px;
+                padding: 12px 15px;
             }
 
             .shape {
                 width: 70px;
                 height: 70px;
                 font-size: 35px;
-                margin: 15px auto;
+                margin: 20px auto;
+            }
+
+            .shape-label {
+                font-size: 12px;
             }
 
             #target {
@@ -447,6 +521,9 @@
             categoryHeader.textContent = currentCategory.name;
 
             currentCategory.items.forEach((item, index) => {
+                const shapeContainer = document.createElement('div');
+                shapeContainer.style.textAlign = 'center';
+
                 const shape = document.createElement('div');
                 shape.className = `shape ${currentCategory.name.toLowerCase()}`;
                 shape.id = item.id;
@@ -454,7 +531,14 @@
                 shape.draggable = true;
                 shape.addEventListener('dragstart', dragStart);
                 shape.addEventListener('touchstart', touchStart, { passive: false });
-                sidebar.appendChild(shape);
+
+                const label = document.createElement('div');
+                label.className = 'shape-label';
+                label.textContent = item.name;
+
+                shapeContainer.appendChild(shape);
+                shapeContainer.appendChild(label);
+                sidebar.appendChild(shapeContainer);
             });
 
             correctItem = currentCategory.items[Math.floor(Math.random() * currentCategory.items.length)];
@@ -578,7 +662,7 @@
         }
 
         const link = document.createElement('link');
-        link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap';
+        link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap';
         link.rel = 'stylesheet';
         document.head.appendChild(link);
 
